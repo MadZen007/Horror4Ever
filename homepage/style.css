@@ -77,8 +77,8 @@ header {
 
 .tagline {
   font-family: var(--font-headline);
-  color: var(--text-muted);
-  font-size: 2rem;
+  color: #fff;
+  font-size: 4rem;
   margin-top: 0.5rem;
   letter-spacing: 2px;
 }
