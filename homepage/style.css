@@ -51,9 +51,21 @@ header {
 }
 
 .hero-logo {
-    max-width: 400px;
-    width: 90%;
+    max-width: 900px;
+    min-width: 320px;
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto 3.5rem auto;
+    box-shadow: 0 0 40px 10px rgba(0,0,0,0.7);
+}
+
+@media (max-width: 600px) {
+  .hero-logo {
+    max-width: 98vw;
+    min-width: unset;
     margin-bottom: 2rem;
+  }
 }
 
 .main-headline {
