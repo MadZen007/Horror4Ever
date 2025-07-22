@@ -1,0 +1,119 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Alegreya&family=Belleza&display=swap');
+
+/* Define Custom Fonts */
+@font-face {
+  font-family: 'YouMurdererBB';
+  src: url('../fonts/youmurdererbb_reg.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Define Color and Font Variables */
+:root {
+  --background: #000000;
+  --text-main: #E0E0E0;
+  --text-muted: #999999;
+  --card-background: #1A1A1A;
+  --border-color: #333333;
+  --primary-red: #D60000;
+  --accent-orange: #FF7518;
+  --accent-orange-hsl: 27, 100%, 55%; /* HSL for shadow effect */
+
+  --font-headline: 'YouMurdererBB', sans-serif;
+  --font-secondary-headline: 'Belleza', sans-serif;
+  --font-body: 'Alegreya', serif;
+}
+
+/* Global and Body Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  text-align: center;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* Header and Typography Styles */
+header {
+  margin: 3rem 0;
+}
+
+.hero-logo {
+    max-width: 400px;
+    width: 90%;
+    margin-bottom: 2rem;
+}
+
+.main-headline {
+  font-family: var(--font-headline);
+  color: var(--primary-red);
+  font-size: 4rem;
+  letter-spacing: 4px;
+}
+
+.tagline {
+  font-family: var(--font-secondary-headline);
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.secondary-headline {
+  font-family: var(--font-secondary-headline);
+  color: var(--text-main);
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+p {
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+/* Card and Grid Styles */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.card {
+  background-color: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 2rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Button Styles */
+.btn {
+  display: inline-block;
+  margin-top: 1.5rem;
+  background-color: var(--accent-orange);
+  color: var(--background);
+  font-family: var(--font-secondary-headline);
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 0.75rem 2rem;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover Effects */
+.btn:hover, .card:hover {
+  transform: scale(1.1); /* Adjusted for a less extreme default hover */
+  box-shadow: 0 0 25px 6px hsla(var(--accent-orange-hsl), 0.6);
+} 
