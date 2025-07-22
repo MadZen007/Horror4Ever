@@ -76,10 +76,11 @@ header {
 }
 
 .tagline {
-  font-family: var(--font-secondary-headline);
+  font-family: var(--font-headline);
   color: var(--text-muted);
-  font-size: 1.5rem;
+  font-size: 2rem;
   margin-top: 0.5rem;
+  letter-spacing: 2px;
 }
 
 .secondary-headline {
