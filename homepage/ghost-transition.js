@@ -6,5 +6,5 @@ function triggerGhostTransition(targetUrl) {
   setTimeout(() => {
     overlay.style.pointerEvents = 'none';
     window.location.href = targetUrl;
-  }, 1000); // Match this to the duration of your swipe
+  }, 1500); // Increased to 1.5s for longer effect
 }
