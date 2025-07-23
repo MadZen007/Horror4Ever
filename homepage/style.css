@@ -207,9 +207,16 @@ p {
   border-radius: 50%;
 }
 .floating-meme-btn:hover, .floating-meme-btn:focus {
-  transform: scale(1.1);
-  box-shadow: 0 0 25px 6px hsla(var(--accent-orange-hsl), 0.6);
+  transform: scale(1.5) rotate(-10deg);
+  animation: meme-rock 0.4s alternate infinite ease-in-out;
   outline: none;
+  box-shadow: none;
+}
+
+@keyframes meme-rock {
+  0% { transform: scale(1.5) rotate(-10deg); }
+  50% { transform: scale(1.5) rotate(10deg); }
+  100% { transform: scale(1.5) rotate(-10deg); }
 }
 
 .meme-modal {
