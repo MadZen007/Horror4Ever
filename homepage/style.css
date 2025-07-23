@@ -135,4 +135,22 @@ p {
 .btn:hover, .card:hover {
   transform: scale(1.1); /* Adjusted for a less extreme default hover */
   box-shadow: 0 0 25px 6px hsla(var(--accent-orange-hsl), 0.6);
-} 
+} #ghost-overlay {
+  position: fixed;
+  bottom: -100%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  transition: bottom 0.8s ease-in-out;
+  pointer-events: none;
+}
+
+#ghost-overlay img {
+  max-height: 100%;
+  max-width: 100%;
+}
