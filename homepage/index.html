@@ -41,6 +41,11 @@
         </div>
       </div>
     </main>
+    <div class="support-about-row">
+      <a href="https://ko-fi.com/YOUR_KOFI_USERNAME" class="btn" target="_blank" rel="noopener noreferrer" aria-label="Support us on Ko-fi">Support Us on Ko-fi</a>
+      <a href="about.html" class="btn" aria-label="About Us">About Us</a>
+      <!-- Placeholder: Add more info or buttons here as needed -->
+    </div>
     <div id="ghost-overlay">
       <img src="images/ghost-swipe-cropped.png" alt="Ghost swipe animation" />
     </div>
@@ -59,7 +64,52 @@
           audio.currentTime = 0;
         });
       }
+
+      // Meme popup logic
+      const memeBtn = document.getElementById('meme-btn');
+      const memeModal = document.getElementById('meme-modal');
+      const memeImg = document.getElementById('meme-img');
+      const memeClose = document.getElementById('meme-modal-close');
+      // TODO: Replace with your actual meme filenames
+      const memes = [
+        'fire-elmo.gif',
+        'under-construction-skeleton.png',
+        'h4e-logo-no-bg.png',
+        '3D pumpkin no bg.png'
+      ];
+      memeBtn.addEventListener('click', function() {
+        const randomMeme = memes[Math.floor(Math.random() * memes.length)];
+        memeImg.src = 'images/' + randomMeme;
+        memeImg.alt = 'Random meme';
+        memeModal.style.display = 'flex';
+        memeClose.focus();
+      });
+      memeClose.addEventListener('click', function() {
+        memeModal.style.display = 'none';
+        memeImg.src = '';
+      });
+      memeModal.addEventListener('click', function(e) {
+        if (e.target === memeModal) {
+          memeModal.style.display = 'none';
+          memeImg.src = '';
+        }
+      });
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && memeModal.style.display === 'flex') {
+          memeModal.style.display = 'none';
+          memeImg.src = '';
+        }
+      });
     });
     </script>
+    <button class="floating-meme-btn" id="meme-btn" aria-label="Show a random meme">
+      <img src="images/3D pumpkin no bg.png" alt="Show a random meme" />
+    </button>
+    <div id="meme-modal" class="meme-modal" style="display:none;">
+      <div class="meme-modal-content">
+        <button class="meme-modal-close" id="meme-modal-close" aria-label="Close meme">&times;</button>
+        <img id="meme-img" src="" alt="Random meme" />
+      </div>
+    </div>
   </body>
 </html>
