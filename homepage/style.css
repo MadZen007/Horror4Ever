@@ -60,6 +60,24 @@ header {
     box-shadow: 0 0 40px 10px rgba(0,0,0,0.7);
 }
 
+.logo-hover-container {
+  position: relative;
+  display: inline-block;
+}
+.logo-hover-container .hover-gif {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+.logo-hover-container:hover .hero-logo:not(.hover-gif) {
+  display: none;
+}
+.logo-hover-container:hover .hover-gif {
+  display: block !important;
+}
+
 @media (max-width: 600px) {
   .hero-logo {
     max-width: 98vw;

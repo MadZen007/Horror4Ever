@@ -8,8 +8,12 @@
   </head>
   <body>
     <header>
-      <!-- Placeholder for Primary Emblem Logo -->
-      <video src="images/H4E-loop-logo.mp4" alt="Ornate spooky doorway with text Horror 4 Ever, Dare to Enter?" class="hero-logo" autoplay loop muted playsinline></video>
+      <!-- Logo Hover Effect Container -->
+      <div class="logo-hover-container">
+        <video src="images/H4E-loop-logo.mp4" alt="Ornate spooky doorway with text Horror 4 Ever, Dare to Enter?" class="hero-logo" autoplay loop muted playsinline></video>
+        <img src="images/fire-elmo.gif" alt="Horror4Ever Logo Hover" class="hero-logo hover-gif" style="display:none;" />
+        <audio id="logo-hover-audio" src="images/vincent_price_laugh.mp3"></audio>
+      </div>
       <p class="tagline">Horror never dies...and neither do the fans!</p>
     </header>
 
@@ -41,5 +45,21 @@
       <img src="ghost-swipe-cropped.png" alt="Ghost swipe animation" />
     </div>
     <script src="ghost-transition.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const container = document.querySelector('.logo-hover-container');
+      const audio = document.getElementById('logo-hover-audio');
+      if (container && audio) {
+        container.addEventListener('mouseenter', () => {
+          audio.currentTime = 0;
+          audio.play();
+        });
+        container.addEventListener('mouseleave', () => {
+          audio.pause();
+          audio.currentTime = 0;
+        });
+      }
+    });
+    </script>
   </body>
 </html>
