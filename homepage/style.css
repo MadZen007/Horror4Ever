@@ -70,12 +70,17 @@ header {
   width: 100%; height: 100%;
   object-fit: contain;
   pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
 }
-.logo-hover-container:hover .hero-logo:not(.hover-gif) {
-  display: none;
+.logo-hover-container .hero-logo {
+  transition: opacity 0.2s;
+}
+.logo-hover-container:hover .hero-logo {
+  opacity: 0;
 }
 .logo-hover-container:hover .hover-gif {
-  display: block !important;
+  opacity: 1;
 }
 
 @media (max-width: 600px) {
