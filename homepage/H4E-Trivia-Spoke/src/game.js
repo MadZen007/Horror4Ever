@@ -86,6 +86,12 @@ class HorrorTriviaGame {
     
     // Load question content
     this.questionText.textContent = this.currentQuestion.question;
+    
+    // Load image with error handling
+    this.questionImage.onerror = () => {
+      // If external image fails, fall back to placeholder
+      this.questionImage.src = '../images/skeletonquestion.png';
+    };
     this.questionImage.src = this.currentQuestion.image;
     
     // Load options
