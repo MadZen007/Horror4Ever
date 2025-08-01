@@ -29,7 +29,7 @@ const approvedQuestions = [
   {
     "id": "4",
     "question": "What is the name of the hotel in 'The Shining'?",
-    "image": "../homepage/images/skeletonquestion.png",
+    "image": "../images/skeletonquestion.png",
     "options": ["The Overlook Hotel", "The Stanley Hotel", "The Timberline Lodge", "The Mount Washington Hotel"],
     "correctAnswer": "The Overlook Hotel",
     "explanation": "The Overlook Hotel is the haunted hotel where the Torrance family stays in 'The Shining'."
@@ -37,7 +37,7 @@ const approvedQuestions = [
   {
     "id": "5",
     "question": "Who directed 'Halloween' (1978)?",
-    "image": "../homepage/images/skeletonquestion.png",
+    "image": "../images/skeletonquestion.png",
     "options": ["Wes Craven", "John Carpenter", "Tobe Hooper", "George A. Romero"],
     "correctAnswer": "John Carpenter",
     "explanation": "John Carpenter directed, co-wrote, and composed the music for the original 'Halloween'."
@@ -45,7 +45,7 @@ const approvedQuestions = [
   {
     "id": "6",
     "question": "What is the name of the demon in 'The Exorcist'?",
-    "image": "../homepage/images/skeletonquestion.png",
+    "image": "../images/skeletonquestion.png",
     "options": ["Pazuzu", "Asmodeus", "Belial", "Mammon"],
     "correctAnswer": "Pazuzu",
     "explanation": "Pazuzu is the demon that possesses Regan in 'The Exorcist'."
@@ -53,7 +53,7 @@ const approvedQuestions = [
   {
     "id": "7",
     "question": "In 'A Nightmare on Elm Street', what is Freddy's full name?",
-    "image": "../homepage/images/skeletonquestion.png",
+    "image": "../images/skeletonquestion.png",
     "options": ["Frederick Krueger", "Freddy Krueger", "Frederick Charles Krueger", "Freddy Charles Krueger"],
     "correctAnswer": "Frederick Charles Krueger",
     "explanation": "Freddy's full name is Frederick Charles Krueger, as revealed in the films."
@@ -61,7 +61,7 @@ const approvedQuestions = [
   {
     "id": "8",
     "question": "What year was the original 'Friday the 13th' released?",
-    "image": "../homepage/images/skeletonquestion.png",
+    "image": "../images/skeletonquestion.png",
     "options": ["1978", "1980", "1982", "1984"],
     "correctAnswer": "1980",
     "explanation": "The original 'Friday the 13th' was released in 1980, introducing Jason Voorhees' mother as the killer."
@@ -69,7 +69,7 @@ const approvedQuestions = [
   {
     "id": "9",
     "question": "What is the name of the killer doll in 'Child's Play'?",
-    "image": "../homepage/images/skeletonquestion.png",
+    "image": "../images/skeletonquestion.png",
     "options": ["Billy", "Chucky", "Dolly", "Buddy"],
     "correctAnswer": "Chucky",
     "explanation": "Chucky is the possessed Good Guys doll that contains the soul of serial killer Charles Lee Ray."
@@ -77,7 +77,7 @@ const approvedQuestions = [
   {
     "id": "10",
     "question": "Who plays Norman Bates in the original 'Psycho'?",
-    "image": "../homepage/images/skeletonquestion.png",
+    "image": "../images/skeletonquestion.png",
     "options": ["Anthony Perkins", "Vince Vaughn", "Freddie Highmore", "James D'Arcy"],
     "correctAnswer": "Anthony Perkins",
     "explanation": "Anthony Perkins played Norman Bates in Alfred Hitchcock's original 'Psycho' (1960)."
@@ -89,7 +89,7 @@ const pendingQuestions = [
   {
     "id": "p1",
     "question": "What is the name of the fictional town where 'Stranger Things' is primarily set?",
-    "image": "../homepage/images/skeletonquestion.png",
+    "image": "../images/skeletonquestion.png",
     "options": ["Hawkins", "Springfield", "Riverdale", "Mystic Falls"],
     "correctAnswer": "Hawkins",
     "explanation": "Hawkins, Indiana is the fictional town where most of the events in 'Stranger Things' take place.",
@@ -100,7 +100,7 @@ const pendingQuestions = [
   {
     "id": "p2",
     "question": "In 'The Silence of the Lambs', what is Hannibal Lecter's profession?",
-    "image": "../homepage/images/skeletonquestion.png",
+    "image": "../images/skeletonquestion.png",
     "options": ["Psychiatrist", "Surgeon", "Psychologist", "Criminal Profiler"],
     "correctAnswer": "Psychiatrist",
     "explanation": "Dr. Hannibal Lecter was a brilliant psychiatrist and cannibalistic serial killer.",

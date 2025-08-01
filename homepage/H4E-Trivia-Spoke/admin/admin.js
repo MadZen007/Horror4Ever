@@ -173,21 +173,21 @@ function generateNewQuestions() {
   const sampleQuestions = [
     {
       question: "What is the name of the demonic entity in 'The Conjuring'?",
-      image: "../homepage/images/skeletonquestion.png",
+      image: "../images/skeletonquestion.png",
       options: ["Valak", "Bathsheba", "Annabelle", "The Nun"],
       correctAnswer: "Valak",
       explanation: "Valak is the demonic entity that appears as a nun in 'The Conjuring' universe."
     },
     {
       question: "In 'The Texas Chain Saw Massacre', what does Leatherface use as his weapon?",
-      image: "../homepage/images/skeletonquestion.png",
+      image: "../images/skeletonquestion.png",
       options: ["Machete", "Chainsaw", "Axe", "Knife"],
       correctAnswer: "Chainsaw",
       explanation: "Leatherface is known for using a chainsaw as his primary weapon in the film."
     },
     {
       question: "What year was the original 'Night of the Living Dead' released?",
-      image: "../homepage/images/skeletonquestion.png",
+      image: "../images/skeletonquestion.png",
       options: ["1966", "1968", "1970", "1972"],
       correctAnswer: "1968",
       explanation: "George A. Romero's 'Night of the Living Dead' was released in 1968."
