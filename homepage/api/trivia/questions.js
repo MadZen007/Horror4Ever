@@ -44,9 +44,12 @@ async function handleGet(req, res) {
   
   // If a specific question ID is requested
   if (id) {
+    console.log('API: Fetching question with ID:', id, 'Type:', typeof id);
     try {
       const sql = 'SELECT * FROM trivia_questions WHERE id = $1';
+      console.log('API: Executing SQL:', sql, 'with params:', [id]);
       const result = await pool.query(sql, [id]);
+      console.log('API: Query result rows:', result.rows.length);
       
       if (result.rows.length === 0) {
         return res.status(404).json({ error: 'Question not found' });
