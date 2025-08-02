@@ -73,7 +73,10 @@ class HorrorTriviaGame {
       this.startButton.textContent = 'Loading Questions...';
       
       // Fetch initial batch of questions from database
+      console.log('Fetching questions from API...');
       const response = await fetch('/api/trivia/questions?limit=20&approved=true&random=true');
+      console.log('API response status:', response.status);
+      
       if (!response.ok) {
         throw new Error('Failed to fetch questions');
       }
@@ -81,6 +84,7 @@ class HorrorTriviaGame {
       this.gameQuestions = await response.json();
       
       console.log(`Loaded ${this.gameQuestions.length} questions for the game`);
+      console.log('First question sample:', this.gameQuestions[0]);
       
       if (this.gameQuestions.length === 0) {
         throw new Error('No questions available');
@@ -130,6 +134,7 @@ class HorrorTriviaGame {
     this.totalQuestionsSpan.textContent = this.gameQuestions.length;
     
     // Load question content
+    console.log('Loading question:', this.currentQuestion);
     this.questionText.textContent = this.currentQuestion.question;
     
     // Load image with error handling
@@ -141,15 +146,19 @@ class HorrorTriviaGame {
     
     // Load options (handle both array and JSON string formats)
     let options = this.currentQuestion.options;
+    console.log('Raw options:', options);
+    
     if (typeof options === 'string') {
       try {
         options = JSON.parse(options);
+        console.log('Parsed options:', options);
       } catch (e) {
         console.error('Error parsing options:', e);
         options = [];
       }
     }
     
+    console.log('Final options to display:', options);
     options.forEach((option, index) => {
       const optionText = document.getElementById(`option${index}`);
       optionText.textContent = option;
