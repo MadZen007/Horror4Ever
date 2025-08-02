@@ -170,7 +170,12 @@
           localStorage.setItem('horror4ever_member_name', result.member.name);
           localStorage.setItem('horror4ever_member_icon', result.member.icon || '');
           alert('Welcome to Horror4Ever! You can now submit questions.');
-          window.location.href = 'index.html';
+          // Show option to personalize profile or go to game
+          if (confirm('Would you like to personalize your profile now, or go straight to the game?')) {
+            window.location.href = 'profile.html';
+          } else {
+            window.location.href = 'index.html';
+          }
         } else {
           const error = await response.json();
           alert(`Signup failed: ${error.error}`);
