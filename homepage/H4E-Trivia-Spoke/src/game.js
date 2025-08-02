@@ -30,7 +30,6 @@ class HorrorTriviaGame {
     
     // Question screen elements
     this.currentQuestionSpan = document.getElementById('currentQuestion');
-    this.totalQuestionsSpan = document.getElementById('totalQuestions');
     this.timeLeftSpan = document.getElementById('timeLeft');
     this.currentScoreSpan = document.getElementById('currentScore');
     this.timerFill = document.getElementById('timerFill');
@@ -131,7 +130,6 @@ class HorrorTriviaGame {
     
     // Update question counter
     this.currentQuestionSpan.textContent = this.currentQuestionIndex + 1;
-    this.totalQuestionsSpan.textContent = this.gameQuestions.length;
     
     // Load question content
     console.log('Loading question:', this.currentQuestion);
