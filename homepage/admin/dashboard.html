@@ -673,8 +673,10 @@
 
         // View question details
         async function viewQuestionDetails(questionId) {
+            console.log('Viewing details for question ID:', questionId, 'Type:', typeof questionId);
             try {
                 const response = await fetch(`/api/trivia/questions?id=${questionId}`);
+                console.log('Response status:', response.status);
                 if (!response.ok) throw new Error('Failed to load question details');
                 
                 const question = await response.json();
