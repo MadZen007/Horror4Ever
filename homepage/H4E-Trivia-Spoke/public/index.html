@@ -140,7 +140,7 @@
           
           <div class="form-buttons">
             <button type="submit" class="submit-button">SUBMIT QUESTION</button>
-            <button type="button" class="cancel-button" onclick="goBackToStart()">CANCEL</button>
+            <button type="button" class="cancel-button" onclick="window.location.href='../../fun.html'">CANCEL</button>
           </div>
         </form>
       </div>
@@ -207,15 +207,7 @@
             }
           }
           
-          function goBackToStart() {
-            if (window.horrorTriviaGame) {
-              window.horrorTriviaGame.showScreen(window.horrorTriviaGame.startScreen);
-            } else {
-              // Fallback: hide suggestion screen and show start screen
-              document.getElementById('suggestionScreen').classList.remove('active');
-              document.getElementById('startScreen').classList.add('active');
-            }
-          }
+
         </script>
 
         <!-- Site visit tracking -->
