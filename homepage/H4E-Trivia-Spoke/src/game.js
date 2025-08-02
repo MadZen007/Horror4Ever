@@ -135,14 +135,23 @@ class HorrorTriviaGame {
     
     // Load question content
     console.log('Loading question:', this.currentQuestion);
+    
+    if (!this.questionText) {
+      console.error('questionText element not found!');
+      return;
+    }
     this.questionText.textContent = this.currentQuestion.question;
     
     // Load image with error handling
-    this.questionImage.onerror = () => {
-      // If external image fails, fall back to placeholder
-      this.questionImage.src = '../images/skeletonquestion.png';
-    };
-    this.questionImage.src = this.currentQuestion.image_url || '../images/skeletonquestion.png';
+    if (this.questionImage) {
+      this.questionImage.onerror = () => {
+        // If external image fails, fall back to placeholder
+        this.questionImage.src = '../images/skeletonquestion.png';
+      };
+      this.questionImage.src = this.currentQuestion.image_url || '../images/skeletonquestion.png';
+    } else {
+      console.error('questionImage element not found!');
+    }
     
     // Load options (handle both array and JSON string formats)
     let options = this.currentQuestion.options;
@@ -161,12 +170,20 @@ class HorrorTriviaGame {
     console.log('Final options to display:', options);
     options.forEach((option, index) => {
       const optionText = document.getElementById(`option${index}`);
+      if (!optionText) {
+        console.error(`option${index} element not found!`);
+        return;
+      }
       optionText.textContent = option;
       
       // Reset button styles
       const button = this.optionButtons[index];
-      button.className = 'option-button';
-      button.disabled = false;
+      if (button) {
+        button.className = 'option-button';
+        button.disabled = false;
+      } else {
+        console.error(`option button ${index} not found!`);
+      }
     });
     
     // Start timer
