@@ -276,6 +276,62 @@
 
         .modal-body {
             padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .edit-modal {
+            max-width: 600px;
+            width: 90%;
+        }
+        
+        .edit-modal .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .edit-modal label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #ff6b35;
+        }
+        
+        .edit-modal input,
+        .edit-modal textarea,
+        .edit-modal select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background: #2a2a2a;
+            color: #fff;
+            font-size: 14px;
+        }
+        
+        .edit-modal textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .edit-modal .form-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .save-button {
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .save-button:hover {
+            background: linear-gradient(45deg, #e55a2b, #e0851a);
         }
 
         .question-detail-section {
@@ -587,11 +643,11 @@
                         </div>
                         <div class="question-actions">
                             ${isApproved ? 
-                                `<button class="action-button edit-btn" onclick="editQuestion(${question.id})">Edit</button>
-                                 <button class="action-button delete-btn" onclick="deleteQuestion(${question.id})">Delete</button>` :
-                                `<button class="action-button edit-btn" onclick="editQuestion(${question.id})">Edit</button>
-                                 <button class="action-button approve-btn" onclick="approveQuestion(${question.id})">Approve</button>
-                                 <button class="action-button reject-btn" onclick="rejectQuestion(${question.id})">Reject</button>`
+                                `<button class="action-button edit-btn" onclick="editQuestion('${question.id}')">Edit</button>
+                                 <button class="action-button delete-btn" onclick="deleteQuestion('${question.id}')">Delete</button>` :
+                                `<button class="action-button edit-btn" onclick="editQuestion('${question.id}')">Edit</button>
+                                 <button class="action-button approve-btn" onclick="approveQuestion('${question.id}')">Approve</button>
+                                 <button class="action-button reject-btn" onclick="rejectQuestion('${question.id}')">Reject</button>`
                             }
                         </div>
                     </div>
@@ -788,9 +844,139 @@
             }
         }
 
-        // Edit a question (placeholder)
-        function editQuestion(questionId) {
-            alert('Edit functionality coming soon! Question ID: ' + questionId);
+        // Edit a question
+        async function editQuestion(questionId) {
+            try {
+                // First, fetch the question details
+                const response = await fetch(`/api/trivia/questions?id=${questionId}`);
+                if (!response.ok) throw new Error('Failed to load question details');
+                
+                const question = await response.json();
+                
+                // Parse options and member credits
+                let options = question.options;
+                if (typeof options === 'string') {
+                    try {
+                        options = JSON.parse(options);
+                    } catch (e) {
+                        options = [];
+                    }
+                }
+                
+                // Create edit modal
+                const modalContent = `
+                    <div class="modal-overlay" onclick="closeModal()">
+                        <div class="modal-content edit-modal" onclick="event.stopPropagation()">
+                            <div class="modal-header">
+                                <h3>Edit Question</h3>
+                                <button class="modal-close" onclick="closeModal()">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="editQuestionForm">
+                                    <div class="form-group">
+                                        <label for="editQuestion">Question:</label>
+                                        <textarea id="editQuestion" name="question" required>${question.question}</textarea>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="editImageUrl">Image URL:</label>
+                                        <input type="url" id="editImageUrl" name="image_url" value="${question.image_url || ''}">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Options:</label>
+                                        <input type="text" id="editOption1" name="option1" value="${options[0] || ''}" placeholder="Option A" required>
+                                        <input type="text" id="editOption2" name="option2" value="${options[1] || ''}" placeholder="Option B" required>
+                                        <input type="text" id="editOption3" name="option3" value="${options[2] || ''}" placeholder="Option C" required>
+                                        <input type="text" id="editOption4" name="option4" value="${options[3] || ''}" placeholder="Option D" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="editCorrectAnswer">Correct Answer:</label>
+                                        <input type="text" id="editCorrectAnswer" name="correct_answer" value="${question.correct_answer}" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="editExplanation">Explanation (Optional):</label>
+                                        <textarea id="editExplanation" name="explanation">${question.explanation || ''}</textarea>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="editCategory">Category:</label>
+                                        <select id="editCategory" name="category">
+                                            <option value="horror" ${question.category === 'horror' ? 'selected' : ''}>Horror</option>
+                                            <option value="thriller" ${question.category === 'thriller' ? 'selected' : ''}>Thriller</option>
+                                            <option value="sci-fi" ${question.category === 'sci-fi' ? 'selected' : ''}>Sci-Fi</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="editDifficulty">Difficulty:</label>
+                                        <select id="editDifficulty" name="difficulty">
+                                            <option value="1" ${question.difficulty === 1 ? 'selected' : ''}>Easy</option>
+                                            <option value="2" ${question.difficulty === 2 ? 'selected' : ''}>Medium</option>
+                                            <option value="3" ${question.difficulty === 3 ? 'selected' : ''}>Hard</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-buttons">
+                                        <button type="submit" class="save-button">Save Changes</button>
+                                        <button type="button" class="cancel-button" onclick="closeModal()">Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Show modal
+                document.body.insertAdjacentHTML('beforeend', modalContent);
+                
+                // Handle form submission
+                document.getElementById('editQuestionForm').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(e.target);
+                    const options = [
+                        formData.get('option1'),
+                        formData.get('option2'),
+                        formData.get('option3'),
+                        formData.get('option4')
+                    ];
+                    
+                    const updateData = {
+                        question: formData.get('question'),
+                        image_url: formData.get('image_url'),
+                        options: options,
+                        correct_answer: formData.get('correct_answer'),
+                        explanation: formData.get('explanation'),
+                        category: formData.get('category'),
+                        difficulty: parseInt(formData.get('difficulty'))
+                    };
+                    
+                    try {
+                        const updateResponse = await fetch(`/api/trivia/questions?id=${questionId}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(updateData)
+                        });
+                        
+                        if (!updateResponse.ok) throw new Error('Failed to update question');
+                        
+                        showMessage('Question updated successfully!', 'success');
+                        closeModal();
+                        loadQuestions();
+                        
+                    } catch (error) {
+                        console.error('Error updating question:', error);
+                        showMessage('Failed to update question', 'error');
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error loading question for edit:', error);
+                showMessage('Failed to load question details', 'error');
+            }
         }
 
         // Refresh stats
