@@ -31,7 +31,10 @@
             <li>Get explanations for each answer</li>
           </ul>
         </div>
-        <button id="startGame" class="start-button">START GAME</button>
+        <div class="button-group">
+          <button id="startGame" class="start-button">START GAME</button>
+          <button id="suggestQuestion" class="suggest-button">SUGGEST QUESTION</button>
+        </div>
       </div>
     </div>
 
@@ -79,6 +82,69 @@
             </button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Suggestion Form Screen -->
+    <div id="suggestionScreen" class="screen">
+      <div class="suggestion-content">
+        <h1 class="suggestion-title">🎃 SUGGEST A QUESTION 🎃</h1>
+        <p class="suggestion-subtitle">Help us expand our horror trivia collection!</p>
+        
+        <form id="suggestionForm" class="suggestion-form">
+          <div class="form-group">
+            <label for="questionText">Question:</label>
+            <textarea id="questionText" name="question" required placeholder="Enter your horror trivia question here..."></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="correctAnswer">Correct Answer:</label>
+            <input type="text" id="correctAnswer" name="correctAnswer" required placeholder="The correct answer">
+          </div>
+          
+          <div class="form-group">
+            <label for="wrongAnswer1">Wrong Answer 1:</label>
+            <input type="text" id="wrongAnswer1" name="wrongAnswer1" required placeholder="First wrong option">
+          </div>
+          
+          <div class="form-group">
+            <label for="wrongAnswer2">Wrong Answer 2:</label>
+            <input type="text" id="wrongAnswer2" name="wrongAnswer2" required placeholder="Second wrong option">
+          </div>
+          
+          <div class="form-group">
+            <label for="wrongAnswer3">Wrong Answer 3:</label>
+            <input type="text" id="wrongAnswer3" name="wrongAnswer3" required placeholder="Third wrong option">
+          </div>
+          
+          <div class="form-group">
+            <label for="imageUrl">
+              Image URL: 
+              <span class="info-icon" title="For images, you can use: 1) Direct image URLs ending in .jpg, .png, .gif 2) Imgur links 3) Upload to imgur.com and copy the direct link 4) Use our placeholder: ../images/skeletonquestion.png">ⓘ</span>
+            </label>
+            <input type="url" id="imageUrl" name="imageUrl" placeholder="https://example.com/image.jpg or ../images/skeletonquestion.png">
+          </div>
+          
+          <div class="form-group">
+            <label for="explanation">Explanation (Optional):</label>
+            <textarea id="explanation" name="explanation" placeholder="Provide additional context or explanation for the correct answer..."></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="memberName">Your Name (for credits):</label>
+            <input type="text" id="memberName" name="memberName" required placeholder="How you want to be credited">
+          </div>
+          
+          <div class="form-group">
+            <label for="memberIcon">Your Icon URL (Optional):</label>
+            <input type="url" id="memberIcon" name="memberIcon" placeholder="https://example.com/your-icon.jpg">
+          </div>
+          
+          <div class="form-buttons">
+            <button type="submit" class="submit-button">SUBMIT QUESTION</button>
+            <button type="button" class="cancel-button" onclick="game.showScreen(game.startScreen)">CANCEL</button>
+          </div>
+        </form>
       </div>
     </div>
 

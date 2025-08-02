@@ -59,6 +59,17 @@ class HorrorTriviaGame {
     this.playAgainButton.addEventListener('click', () => this.restartGame());
     this.stopButton.addEventListener('click', () => this.stopGame());
     
+    // Suggestion form events
+    const suggestButton = document.getElementById('suggestQuestion');
+    if (suggestButton) {
+      suggestButton.addEventListener('click', () => this.showSuggestionForm());
+    }
+    
+    const suggestionForm = document.getElementById('suggestionForm');
+    if (suggestionForm) {
+      suggestionForm.addEventListener('submit', (e) => this.handleSuggestionSubmit(e));
+    }
+    
     // Option button events
     this.optionButtons.forEach(button => {
       button.addEventListener('click', (e) => this.selectAnswer(e));
@@ -457,6 +468,71 @@ class HorrorTriviaGame {
     } catch (error) {
       console.error('Failed to track question response:', error);
     }
+  }
+
+  // Suggestion form methods
+  showSuggestionForm() {
+    this.showScreen(document.getElementById('suggestionScreen'));
+  }
+
+  async handleSuggestionSubmit(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const suggestionData = {
+      question: formData.get('question'),
+      correctAnswer: formData.get('correctAnswer'),
+      wrongAnswer1: formData.get('wrongAnswer1'),
+      wrongAnswer2: formData.get('wrongAnswer2'),
+      wrongAnswer3: formData.get('wrongAnswer3'),
+      imageUrl: formData.get('imageUrl') || '../images/skeletonquestion.png',
+      explanation: formData.get('explanation') || '',
+      memberName: formData.get('memberName'),
+      memberIcon: formData.get('memberIcon') || ''
+    };
+
+    try {
+      const response = await fetch('/api/trivia/suggest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(suggestionData)
+      });
+
+      if (response.ok) {
+        this.showSuggestionSuccess(suggestionData);
+      } else {
+        throw new Error('Failed to submit suggestion');
+      }
+    } catch (error) {
+      console.error('Error submitting suggestion:', error);
+      alert('Failed to submit suggestion. Please try again.');
+    }
+  }
+
+  showSuggestionSuccess(suggestionData) {
+    const suggestionContent = document.querySelector('.suggestion-content');
+    suggestionContent.innerHTML = `
+      <div class="success-message">
+        <h3>✅ Question Submitted Successfully!</h3>
+        <p>Thank you for your contribution to our horror trivia collection!</p>
+        <p><strong>Your question will be reviewed and added to the game once approved.</strong></p>
+        
+        <div class="credits-info">
+          <h4>🎃 Credits & Recognition</h4>
+          <p>When your question is approved, it will include:</p>
+          <ul>
+            <li><strong>Creator Credit:</strong> ${suggestionData.memberName}</li>
+            ${suggestionData.memberIcon ? `<li><strong>Your Icon:</strong> Will be displayed with the question</li>` : ''}
+            <li><strong>Special Recognition:</strong> Your name will appear in the game credits</li>
+            <li><strong>Community Status:</strong> You'll be recognized as a contributing member</li>
+          </ul>
+        </div>
+        
+        <div class="form-buttons">
+          <button class="submit-button" onclick="game.showScreen(game.startScreen)">BACK TO GAME</button>
+        </div>
+      </div>
+    `;
   }
 }
 
