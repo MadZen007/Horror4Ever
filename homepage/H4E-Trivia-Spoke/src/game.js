@@ -556,8 +556,6 @@ class HorrorTriviaGame {
           <h4>🎃 Credits & Recognition</h4>
           <p>When your question is approved, it will include:</p>
           <ul>
-            <li><strong>Creator Credit:</strong> ${suggestionData.memberName}</li>
-            ${suggestionData.memberIcon ? `<li><strong>Your Icon:</strong> Will be displayed with the question</li>` : ''}
             <li><strong>Special Recognition:</strong> Your name will appear in the game credits</li>
             <li><strong>Community Status:</strong> You'll be recognized as a contributing member</li>
           </ul>
