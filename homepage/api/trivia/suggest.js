@@ -27,12 +27,16 @@ export default async function handler(req, res) {
     } = req.body;
 
     // Validate required fields
-    if (!question || !correctAnswer || !wrongAnswer1 || !wrongAnswer2 || !wrongAnswer3 || !memberName) {
+    if (!question || !correctAnswer || !wrongAnswer1 || !wrongAnswer2 || !wrongAnswer3) {
       return res.status(400).json({
         error: 'Missing required fields',
-        details: 'Question, correct answer, all wrong answers, and member name are required'
+        details: 'Question, correct answer, and all wrong answers are required'
       });
     }
+
+    // Auto-generate member info if not provided
+    const finalMemberName = memberName || `Anonymous Member ${Date.now().toString().slice(-4)}`;
+    const finalMemberIcon = memberIcon || '';
 
     // Create options array with correct answer in random position
     const options = [correctAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3];
@@ -59,8 +63,8 @@ export default async function handler(req, res) {
       1, // Default difficulty
       false, // Not approved yet
       JSON.stringify({
-        name: memberName,
-        icon: memberIcon || '',
+        name: finalMemberName,
+        icon: finalMemberIcon,
         submittedAt: new Date().toISOString()
       })
     ];
@@ -70,7 +74,7 @@ export default async function handler(req, res) {
     res.status(200).json({
       success: true,
       message: 'Suggestion submitted successfully! Your question will be reviewed and added to the game once approved.',
-      memberName: memberName
+      memberName: finalMemberName
     });
 
   } catch (error) {

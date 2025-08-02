@@ -473,12 +473,45 @@ class HorrorTriviaGame {
   // Suggestion form methods
   showSuggestionForm() {
     this.showScreen(document.getElementById('suggestionScreen'));
+    this.autoFillMemberInfo();
+  }
+
+  // Auto-fill member information based on session/cookies
+  autoFillMemberInfo() {
+    // Check for existing member session
+    const memberName = localStorage.getItem('horror4ever_member_name');
+    const memberIcon = localStorage.getItem('horror4ever_member_icon');
+    
+    if (memberName) {
+      const nameField = document.getElementById('memberName');
+      if (nameField && !nameField.value) {
+        nameField.value = memberName;
+      }
+    }
+    
+    if (memberIcon) {
+      const iconField = document.getElementById('memberIcon');
+      if (iconField && !iconField.value) {
+        iconField.value = memberIcon;
+      }
+    }
   }
 
   async handleSuggestionSubmit(event) {
     event.preventDefault();
     
     const formData = new FormData(event.target);
+    const memberName = formData.get('memberName') || '';
+    const memberIcon = formData.get('memberIcon') || '';
+    
+    // Save member info to localStorage for future use
+    if (memberName) {
+      localStorage.setItem('horror4ever_member_name', memberName);
+    }
+    if (memberIcon) {
+      localStorage.setItem('horror4ever_member_icon', memberIcon);
+    }
+    
     const suggestionData = {
       question: formData.get('question'),
       correctAnswer: formData.get('correctAnswer'),
@@ -487,8 +520,8 @@ class HorrorTriviaGame {
       wrongAnswer3: formData.get('wrongAnswer3'),
       imageUrl: formData.get('imageUrl') || '../images/skeletonquestion.png',
       explanation: formData.get('explanation') || '',
-      memberName: formData.get('memberName'),
-      memberIcon: formData.get('memberIcon') || ''
+      memberName: memberName,
+      memberIcon: memberIcon
     };
 
     try {

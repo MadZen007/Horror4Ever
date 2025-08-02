@@ -642,6 +642,14 @@ body {
   resize: vertical;
 }
 
+.form-help {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: 5px;
+  font-style: italic;
+}
+
 .info-icon {
   color: var(--accent-orange);
   cursor: help;
