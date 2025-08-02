@@ -195,9 +195,121 @@
             margin-bottom: 10px;
         }
 
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            flex: 1;
+            margin-right: 15px;
+        }
+
         .question-actions {
             display: flex;
             gap: 10px;
+        }
+
+        .view-btn {
+            background: #2196F3;
+            color: white;
+            font-size: 0.8rem;
+            padding: 5px 10px;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #2a2a2a;
+            border: 2px solid #ff6600;
+            border-radius: 15px;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            width: 90%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #444;
+        }
+
+        .modal-header h3 {
+            color: #ff6600;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #ff6600;
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: #ff8c42;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .question-detail-section {
+            margin-bottom: 25px;
+        }
+
+        .question-detail-section h4 {
+            color: #ff6600;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .question-detail-section p {
+            color: #ffffff;
+            margin: 5px 0;
+            line-height: 1.5;
+        }
+
+        .question-detail-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .question-detail-section li {
+            color: #ffffff;
+            margin: 8px 0;
+            padding: 8px;
+            background: rgba(255, 102, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        .correct-option {
+            background: rgba(76, 175, 80, 0.2) !important;
+            border: 1px solid #4CAF50;
         }
 
         .action-button {
@@ -435,24 +547,52 @@
                 return;
             }
 
-            container.innerHTML = questions.map(question => `
-                <div class="question-item">
-                    <div class="question-text">${question.question}</div>
-                    <div class="question-details">
-                        <strong>Category:</strong> ${question.category || 'horror'} | 
-                        <strong>Difficulty:</strong> ${question.difficulty || 1} |
-                        <strong>ID:</strong> ${question.id}
+            container.innerHTML = questions.map(question => {
+                // Parse options from JSON string if needed
+                let options = question.options;
+                if (typeof options === 'string') {
+                    try {
+                        options = JSON.parse(options);
+                    } catch (e) {
+                        options = [];
+                    }
+                }
+                
+                // Parse member credits if available
+                let memberCredits = null;
+                if (question.member_credits) {
+                    try {
+                        memberCredits = typeof question.member_credits === 'string' ? 
+                            JSON.parse(question.member_credits) : question.member_credits;
+                    } catch (e) {
+                        memberCredits = null;
+                    }
+                }
+
+                return `
+                    <div class="question-item">
+                        <div class="question-header">
+                            <div class="question-text">${question.question}</div>
+                            <button class="action-button view-btn" onclick="viewQuestionDetails(${question.id})">👁️ View Details</button>
+                        </div>
+                        <div class="question-details">
+                            <strong>Category:</strong> ${question.category || 'horror'} | 
+                            <strong>Difficulty:</strong> ${question.difficulty || 1} |
+                            <strong>ID:</strong> ${question.id}
+                            ${memberCredits ? ` | <strong>Submitted by:</strong> ${memberCredits.name}` : ''}
+                        </div>
+                        <div class="question-actions">
+                            ${isApproved ? 
+                                `<button class="action-button edit-btn" onclick="editQuestion(${question.id})">Edit</button>
+                                 <button class="action-button delete-btn" onclick="deleteQuestion(${question.id})">Delete</button>` :
+                                `<button class="action-button edit-btn" onclick="editQuestion(${question.id})">Edit</button>
+                                 <button class="action-button approve-btn" onclick="approveQuestion(${question.id})">Approve</button>
+                                 <button class="action-button reject-btn" onclick="rejectQuestion(${question.id})">Reject</button>`
+                            }
+                        </div>
                     </div>
-                    <div class="question-actions">
-                        ${isApproved ? 
-                            `<button class="action-button edit-btn" onclick="editQuestion(${question.id})">Edit</button>
-                             <button class="action-button delete-btn" onclick="deleteQuestion(${question.id})">Delete</button>` :
-                            `<button class="action-button approve-btn" onclick="approveQuestion(${question.id})">Approve</button>
-                             <button class="action-button reject-btn" onclick="rejectQuestion(${question.id})">Reject</button>`
-                        }
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         // Tab switching
@@ -528,6 +668,117 @@
             } catch (error) {
                 console.error('Error deleting question:', error);
                 showMessage('Failed to delete question', 'error');
+            }
+        }
+
+        // View question details
+        async function viewQuestionDetails(questionId) {
+            try {
+                const response = await fetch(`/api/trivia/questions/${questionId}`);
+                if (!response.ok) throw new Error('Failed to load question details');
+                
+                const question = await response.json();
+                
+                // Parse options and member credits
+                let options = question.options;
+                if (typeof options === 'string') {
+                    try {
+                        options = JSON.parse(options);
+                    } catch (e) {
+                        options = [];
+                    }
+                }
+                
+                let memberCredits = null;
+                if (question.member_credits) {
+                    try {
+                        memberCredits = typeof question.member_credits === 'string' ? 
+                            JSON.parse(question.member_credits) : question.member_credits;
+                    } catch (e) {
+                        memberCredits = null;
+                    }
+                }
+                
+                // Create modal content
+                const modalContent = `
+                    <div class="modal-overlay" onclick="closeModal()">
+                        <div class="modal-content" onclick="event.stopPropagation()">
+                            <div class="modal-header">
+                                <h3>Question Details</h3>
+                                <button class="modal-close" onclick="closeModal()">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="question-detail-section">
+                                    <h4>Question:</h4>
+                                    <p>${question.question}</p>
+                                </div>
+                                
+                                <div class="question-detail-section">
+                                    <h4>Image:</h4>
+                                    <img src="${question.image_url || '../images/skeletonquestion.png'}" alt="Question Image" style="max-width: 200px; max-height: 200px; border-radius: 8px;">
+                                </div>
+                                
+                                <div class="question-detail-section">
+                                    <h4>Options:</h4>
+                                    <ul>
+                                        ${options.map((option, index) => `
+                                            <li class="${option === question.correct_answer ? 'correct-option' : ''}">
+                                                ${String.fromCharCode(65 + index)}. ${option}
+                                                ${option === question.correct_answer ? ' ✅' : ''}
+                                            </li>
+                                        `).join('')}
+                                    </ul>
+                                </div>
+                                
+                                <div class="question-detail-section">
+                                    <h4>Correct Answer:</h4>
+                                    <p><strong>${question.correct_answer}</strong></p>
+                                </div>
+                                
+                                ${question.explanation ? `
+                                    <div class="question-detail-section">
+                                        <h4>Explanation:</h4>
+                                        <p>${question.explanation}</p>
+                                    </div>
+                                ` : ''}
+                                
+                                ${memberCredits ? `
+                                    <div class="question-detail-section">
+                                        <h4>Submitted by:</h4>
+                                        <p>
+                                            <strong>${memberCredits.name}</strong>
+                                            ${memberCredits.icon ? `<img src="${memberCredits.icon}" alt="${memberCredits.name}" style="width: 30px; height: 30px; border-radius: 50%; margin-left: 10px;">` : ''}
+                                        </p>
+                                        <p><small>Submitted: ${new Date(memberCredits.submittedAt).toLocaleString()}</small></p>
+                                    </div>
+                                ` : ''}
+                                
+                                <div class="question-detail-section">
+                                    <h4>Metadata:</h4>
+                                    <p><strong>Category:</strong> ${question.category || 'horror'}</p>
+                                    <p><strong>Difficulty:</strong> ${question.difficulty || 1}</p>
+                                    <p><strong>Status:</strong> ${question.is_approved ? 'Approved' : 'Pending'}</p>
+                                    <p><strong>ID:</strong> ${question.id}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Show modal
+                document.body.insertAdjacentHTML('beforeend', modalContent);
+                
+            } catch (error) {
+                console.error('Error loading question details:', error);
+                alert('Failed to load question details');
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            const modal = document.querySelector('.modal-overlay');
+            if (modal) {
+                modal.remove();
             }
         }
 
