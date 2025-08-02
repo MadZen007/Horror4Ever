@@ -409,10 +409,14 @@
         // Load pending questions
         async function loadPendingQuestions() {
             try {
+                console.log('Loading pending questions...');
                 const response = await fetch('/api/trivia/questions?approved=false&limit=50');
+                console.log('Pending questions response status:', response.status);
+                
                 if (!response.ok) throw new Error('Failed to load pending questions');
                 
                 pendingQuestions = await response.json();
+                console.log('Pending questions loaded:', pendingQuestions);
                 displayQuestions('pending-questions', pendingQuestions, false);
                 
             } catch (error) {
