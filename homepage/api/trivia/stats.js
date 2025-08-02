@@ -32,8 +32,8 @@ export default async function handler(req, res) {
       SELECT 
         COUNT(*) as total_games,
         COUNT(CASE WHEN completed = true THEN 1 END) as completed_games,
-        AVG(total_score) as avg_score,
-        SUM(total_score) as total_score,
+        AVG(CASE WHEN completed = true THEN total_score END) as avg_score,
+        SUM(CASE WHEN completed = true THEN total_score END) as total_score,
         COUNT(DISTINCT session_id) as unique_sessions
       FROM game_sessions
     `);

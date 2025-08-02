@@ -38,6 +38,7 @@ class HorrorTriviaGame {
     this.questionText = document.getElementById('questionText');
     this.optionButtons = document.querySelectorAll('.option-button');
     this.totalScoreDisplay = document.getElementById('totalScore');
+    this.stopButton = document.getElementById('stopGame');
     
     // Answer screen elements
     this.resultIcon = document.getElementById('resultIcon');
@@ -57,6 +58,7 @@ class HorrorTriviaGame {
     this.startButton.addEventListener('click', () => this.startGame());
     this.nextButton.addEventListener('click', () => this.nextQuestion());
     this.playAgainButton.addEventListener('click', () => this.restartGame());
+    this.stopButton.addEventListener('click', () => this.stopGame());
     
     // Option button events
     this.optionButtons.forEach(button => {
@@ -70,13 +72,15 @@ class HorrorTriviaGame {
       this.startButton.disabled = true;
       this.startButton.textContent = 'Loading Questions...';
       
-      // Fetch questions from database
-      const response = await fetch('/api/trivia/questions?limit=10&approved=true&random=true');
+      // Fetch initial batch of questions from database
+      const response = await fetch('/api/trivia/questions?limit=20&approved=true&random=true');
       if (!response.ok) {
         throw new Error('Failed to fetch questions');
       }
       
       this.gameQuestions = await response.json();
+      
+      console.log(`Loaded ${this.gameQuestions.length} questions for the game`);
       
       if (this.gameQuestions.length === 0) {
         throw new Error('No questions available');
@@ -103,8 +107,16 @@ class HorrorTriviaGame {
     }
   }
 
-  loadQuestion() {
+  async loadQuestion() {
+    console.log(`Loading question ${this.currentQuestionIndex + 1} of ${this.gameQuestions.length}`);
+    
+    // If we're running low on questions, fetch more
+    if (this.currentQuestionIndex >= this.gameQuestions.length - 5) {
+      await this.fetchMoreQuestions();
+    }
+    
     if (this.currentQuestionIndex >= this.gameQuestions.length) {
+      console.log('Game ending - no more questions available');
       this.endGame();
       return;
     }
@@ -261,11 +273,11 @@ class HorrorTriviaGame {
     this.showScreen(this.answerScreen);
   }
 
-  nextQuestion() {
+  async nextQuestion() {
     this.currentQuestionIndex++;
     this.updateTotalScore();
     this.showScreen(this.questionScreen);
-    this.loadQuestion();
+    await this.loadQuestion();
   }
 
   timeUp() {
@@ -285,6 +297,13 @@ class HorrorTriviaGame {
     
     // Track game end
     this.trackGameEnd();
+  }
+
+  stopGame() {
+    if (confirm('Are you sure you want to stop the game? Your current score will be saved.')) {
+      clearInterval(this.timer);
+      this.endGame();
+    }
   }
 
   getScoreMessage() {
@@ -323,6 +342,24 @@ class HorrorTriviaGame {
     const currentMaxPossibleScore = this.currentQuestionIndex * 10;
     const scoreText = `${this.correctAnswers} out of ${this.currentQuestionIndex} - Score ${this.totalScore} out of ${currentMaxPossibleScore}`;
     this.totalScoreDisplay.textContent = scoreText;
+  }
+
+  // Fetch more questions when running low
+  async fetchMoreQuestions() {
+    try {
+      console.log('Fetching more questions...');
+      const response = await fetch('/api/trivia/questions?limit=20&approved=true&random=true');
+      if (!response.ok) {
+        throw new Error('Failed to fetch more questions');
+      }
+      
+      const newQuestions = await response.json();
+      this.gameQuestions = this.gameQuestions.concat(newQuestions);
+      console.log(`Added ${newQuestions.length} more questions. Total: ${this.gameQuestions.length}`);
+      
+    } catch (error) {
+      console.error('Error fetching more questions:', error);
+    }
   }
 
   // Generate unique session ID

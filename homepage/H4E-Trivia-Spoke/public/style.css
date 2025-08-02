@@ -225,6 +225,27 @@ body {
   color: var(--accent-orange);
 }
 
+.stop-button {
+  background: linear-gradient(45deg, #ff4444, #cc0000);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.stop-button:hover {
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 5px 15px rgba(255, 68, 68, 0.4);
+}
+
 .question-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
