@@ -118,11 +118,14 @@
           </div>
           
           <div class="form-group">
-            <label for="imageUrl">
-              Image URL: 
-              <span class="info-icon" title="For images, you can use: 1) Direct image URLs ending in .jpg, .png, .gif 2) Imgur links 3) Upload to imgur.com and copy the direct link 4) Use our placeholder: ../images/skeletonquestion.png">ⓘ</span>
+            <label for="questionImage">
+              Question Image: 
+              <span class="info-icon" title="Upload an image for your question. Supported formats: JPG, PNG, GIF. Max size: 5MB.">ⓘ</span>
             </label>
-            <input type="url" id="imageUrl" name="imageUrl" placeholder="https://example.com/image.jpg or ../images/skeletonquestion.png">
+            <input type="file" id="questionImage" name="questionImage" accept="image/*" onchange="previewQuestionImage(this)">
+            <div id="imagePreview" class="image-preview" style="display: none;">
+              <img id="previewImg" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; margin-top: 10px;">
+            </div>
           </div>
           
           <div class="form-group">
@@ -186,28 +189,47 @@
 
   <script src="../src/game.js"></script>
   
-  <!-- Site visit tracking -->
-  <script>
-    // Track page visit when page loads
-    window.addEventListener('load', async () => {
-      try {
-        await fetch('/api/trivia/track', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'site_visit',
-            data: {
-              pageUrl: window.location.href,
-              userAgent: navigator.userAgent,
-              referrer: document.referrer || '',
-              sessionId: 'trivia-game-' + Date.now()
+          <!-- Image preview function -->
+        <script>
+          function previewQuestionImage(input) {
+            const preview = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            
+            if (input.files && input.files[0]) {
+              const reader = new FileReader();
+              reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                preview.style.display = 'block';
+              };
+              reader.readAsDataURL(input.files[0]);
+            } else {
+              preview.style.display = 'none';
             }
-          })
-        });
-      } catch (error) {
-        console.log('Site visit tracking failed:', error);
-      }
-    });
-  </script>
+          }
+        </script>
+
+        <!-- Site visit tracking -->
+        <script>
+          // Track page visit when page loads
+          window.addEventListener('load', async () => {
+            try {
+              await fetch('/api/trivia/track', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  action: 'site_visit',
+                  data: {
+                    pageUrl: window.location.href,
+                    userAgent: navigator.userAgent,
+                    referrer: document.referrer || '',
+                    sessionId: 'trivia-game-' + Date.now()
+                  }
+                })
+              });
+            } catch (error) {
+              console.log('Site visit tracking failed:', error);
+            }
+          });
+        </script>
 </body>
 </html> 

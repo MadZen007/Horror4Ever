@@ -901,24 +901,6 @@
                                         <textarea id="editExplanation" name="explanation">${question.explanation || ''}</textarea>
                                     </div>
                                     
-                                    <div class="form-group">
-                                        <label for="editCategory">Category:</label>
-                                        <select id="editCategory" name="category">
-                                            <option value="horror" ${question.category === 'horror' ? 'selected' : ''}>Horror</option>
-                                            <option value="thriller" ${question.category === 'thriller' ? 'selected' : ''}>Thriller</option>
-                                            <option value="sci-fi" ${question.category === 'sci-fi' ? 'selected' : ''}>Sci-Fi</option>
-                                        </select>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="editDifficulty">Difficulty:</label>
-                                        <select id="editDifficulty" name="difficulty">
-                                            <option value="1" ${question.difficulty === 1 ? 'selected' : ''}>Easy</option>
-                                            <option value="2" ${question.difficulty === 2 ? 'selected' : ''}>Medium</option>
-                                            <option value="3" ${question.difficulty === 3 ? 'selected' : ''}>Hard</option>
-                                        </select>
-                                    </div>
-                                    
                                     <div class="form-buttons">
                                         <button type="submit" class="save-button">Save Changes</button>
                                         <button type="button" class="cancel-button" onclick="closeModal()">Cancel</button>
@@ -949,9 +931,7 @@
                         image_url: formData.get('image_url'),
                         options: options,
                         correct_answer: formData.get('correct_answer'),
-                        explanation: formData.get('explanation'),
-                        category: formData.get('category'),
-                        difficulty: parseInt(formData.get('difficulty'))
+                        explanation: formData.get('explanation')
                     };
                     
                     try {

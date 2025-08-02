@@ -515,13 +515,28 @@ class HorrorTriviaGame {
       return;
     }
     
+    // Handle image file upload
+    const imageFile = formData.get('questionImage');
+    let imageUrl = '../images/skeletonquestion.png'; // Default placeholder
+    
+    if (imageFile && imageFile.size > 0) {
+      try {
+        // Convert file to base64
+        const base64 = await this.fileToBase64(imageFile);
+        imageUrl = base64;
+      } catch (error) {
+        console.error('Error processing image:', error);
+        alert('Error processing image. Using default placeholder.');
+      }
+    }
+    
     const suggestionData = {
       question: formData.get('question'),
       correctAnswer: formData.get('correctAnswer'),
       wrongAnswer1: formData.get('wrongAnswer1'),
       wrongAnswer2: formData.get('wrongAnswer2'),
       wrongAnswer3: formData.get('wrongAnswer3'),
-      imageUrl: formData.get('imageUrl') || '../images/skeletonquestion.png',
+      imageUrl: imageUrl,
       explanation: formData.get('explanation') || '',
       memberToken: memberToken
     };
@@ -567,6 +582,17 @@ class HorrorTriviaGame {
       </div>
     `;
   }
+
+  // Helper function to convert file to base64
+  fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+  }
+}
 }
 
 // Initialize the game when the page loads
