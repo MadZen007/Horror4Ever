@@ -529,6 +529,7 @@
                 
                 pendingQuestions = await response.json();
                 console.log('Pending questions loaded:', pendingQuestions);
+                console.log('First question ID:', pendingQuestions[0]?.id, 'Type:', typeof pendingQuestions[0]?.id);
                 displayQuestions('pending-questions', pendingQuestions, false);
                 
             } catch (error) {
@@ -548,6 +549,7 @@
             }
 
             container.innerHTML = questions.map(question => {
+                console.log('Processing question:', question.id, 'Type:', typeof question.id);
                 // Parse options from JSON string if needed
                 let options = question.options;
                 if (typeof options === 'string') {
