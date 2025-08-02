@@ -860,4 +860,31 @@ body {
 
 .member-info-display strong {
   color: #4CAF50;
+}
+
+/* Image Upload Styles */
+input[type="file"] {
+  background: rgba(20, 20, 20, 0.8);
+  border: 2px solid var(--accent-orange);
+  border-radius: 8px;
+  color: var(--text-light);
+  padding: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+input[type="file"]:focus {
+  outline: none;
+  border-color: #ff8c42;
+  box-shadow: 0 0 10px rgba(255, 102, 0, 0.3);
+}
+
+.image-preview {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.image-preview img {
+  border: 2px solid var(--accent-orange);
+  box-shadow: 0 0 10px rgba(255, 102, 0, 0.3);
 } 

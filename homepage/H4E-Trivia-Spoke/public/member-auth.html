@@ -66,8 +66,11 @@
               <input type="password" id="signupPassword" name="password" required minlength="6">
             </div>
             <div class="form-group">
-              <label for="signupIcon">Profile Icon URL (Optional):</label>
-              <input type="url" id="signupIcon" name="icon" placeholder="https://example.com/your-icon.jpg">
+              <label for="signupIcon">Profile Picture (Optional):</label>
+              <input type="file" id="signupIcon" name="icon" accept="image/*" onchange="previewImage(this)">
+              <div id="imagePreview" class="image-preview" style="display: none;">
+                <img id="previewImg" src="" alt="Preview" style="max-width: 100px; max-height: 100px; border-radius: 50%; margin-top: 10px;">
+              </div>
             </div>
             <button type="submit" class="auth-button">JOIN FOR FREE</button>
           </form>
@@ -82,6 +85,23 @@
   </div>
 
   <script>
+    // Image preview function
+    function previewImage(input) {
+      const preview = document.getElementById('imagePreview');
+      const previewImg = document.getElementById('previewImg');
+      
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          previewImg.src = e.target.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+      } else {
+        preview.style.display = 'none';
+      }
+    }
+
     // Handle login form
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -117,6 +137,21 @@
       e.preventDefault();
       const formData = new FormData(e.target);
       
+      // Handle file upload
+      const iconFile = formData.get('icon');
+      let iconData = '';
+      
+      if (iconFile && iconFile.size > 0) {
+        // Convert file to base64 for storage
+        const reader = new FileReader();
+        iconData = await new Promise((resolve) => {
+          reader.onload = function(e) {
+            resolve(e.target.result);
+          };
+          reader.readAsDataURL(iconFile);
+        });
+      }
+      
       try {
         const response = await fetch('/api/trivia/member/signup', {
           method: 'POST',
@@ -125,7 +160,7 @@
             name: formData.get('name'),
             email: formData.get('email'),
             password: formData.get('password'),
-            icon: formData.get('icon') || ''
+            icon: iconData
           })
         });
 
