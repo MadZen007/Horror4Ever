@@ -11,6 +11,8 @@ class HorrorTriviaGame {
     this.timeLeft = 30;
     this.maxTime = 30;
     this.isAnswered = false;
+    this.sessionId = this.generateSessionId();
+    this.gameStartTime = null;
     
     this.initializeElements();
     this.bindEvents();
@@ -83,9 +85,13 @@ class HorrorTriviaGame {
       this.currentQuestionIndex = 0;
       this.totalScore = 0;
       this.correctAnswers = 0;
+      this.gameStartTime = Date.now();
       this.updateTotalScore();
       this.showScreen(this.questionScreen);
       this.loadQuestion();
+      
+      // Track game start
+      this.trackGameStart();
       
     } catch (error) {
       console.error('Error loading questions:', error);
@@ -213,6 +219,9 @@ class HorrorTriviaGame {
       this.correctAnswers++;
     }
     
+    // Track question response
+    this.trackQuestionResponse(selectedAnswer, isCorrect, pointsEarned);
+    
     // Show answer feedback
     this.showAnswerFeedback(selectedIndex, isCorrect, pointsEarned);
   }
@@ -273,6 +282,9 @@ class HorrorTriviaGame {
     this.showScreen(this.gameOverScreen);
     this.finalScore.textContent = this.totalScore;
     this.scoreMessage.textContent = this.getScoreMessage();
+    
+    // Track game end
+    this.trackGameEnd();
   }
 
   getScoreMessage() {
@@ -311,6 +323,79 @@ class HorrorTriviaGame {
     const currentMaxPossibleScore = this.currentQuestionIndex * 10;
     const scoreText = `${this.correctAnswers} out of ${this.currentQuestionIndex} - Score ${this.totalScore} out of ${currentMaxPossibleScore}`;
     this.totalScoreDisplay.textContent = scoreText;
+  }
+
+  // Generate unique session ID
+  generateSessionId() {
+    return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  }
+
+  // Track game start
+  async trackGameStart() {
+    try {
+      await fetch('/api/trivia/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'start_game',
+          data: {
+            sessionId: this.sessionId,
+            userAgent: navigator.userAgent,
+            ipAddress: 'unknown' // We can't get IP from client-side
+          }
+        })
+      });
+    } catch (error) {
+      console.error('Failed to track game start:', error);
+    }
+  }
+
+  // Track game end
+  async trackGameEnd() {
+    try {
+      const maxPossibleScore = this.gameQuestions.length * 10;
+      await fetch('/api/trivia/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'end_game',
+          data: {
+            sessionId: this.sessionId,
+            totalScore: this.totalScore,
+            questionsAnswered: this.currentQuestionIndex,
+            correctAnswers: this.correctAnswers,
+            maxPossibleScore: maxPossibleScore
+          }
+        })
+      });
+    } catch (error) {
+      console.error('Failed to track game end:', error);
+    }
+  }
+
+  // Track question response
+  async trackQuestionResponse(selectedAnswer, isCorrect, pointsEarned) {
+    try {
+      const timeTaken = this.maxTime - this.timeLeft;
+      await fetch('/api/trivia/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'question_response',
+          data: {
+            sessionId: this.sessionId,
+            questionId: this.currentQuestion.id,
+            selectedAnswer: selectedAnswer,
+            correctAnswer: this.currentQuestion.correct_answer,
+            isCorrect: isCorrect,
+            timeTaken: timeTaken,
+            pointsEarned: pointsEarned
+          }
+        })
+      });
+    } catch (error) {
+      console.error('Failed to track question response:', error);
+    }
   }
 }
 
