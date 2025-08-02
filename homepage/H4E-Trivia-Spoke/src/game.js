@@ -577,7 +577,7 @@ class HorrorTriviaGame {
         </div>
         
         <div class="form-buttons">
-          <button class="submit-button" onclick="game.showScreen(game.startScreen)">BACK TO GAME</button>
+          <button class="submit-button" onclick="window.horrorTriviaGame.showScreen(window.horrorTriviaGame.startScreen)">BACK TO GAME</button>
         </div>
       </div>
     `;
