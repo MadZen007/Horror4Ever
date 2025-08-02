@@ -879,8 +879,11 @@
                                     </div>
                                     
                                     <div class="form-group">
-                                        <label for="editImageUrl">Image URL:</label>
-                                        <input type="url" id="editImageUrl" name="image_url" value="${question.image_url || ''}">
+                                        <label>Question Image:</label>
+                                        <div class="question-image-display">
+                                            <img src="${question.image_url || '../images/skeletonquestion.png'}" alt="Question Image" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid #ff6b35;">
+                                        </div>
+                                        <p style="color: #888; font-size: 12px; margin-top: 5px;">Image uploaded by member</p>
                                     </div>
                                     
                                     <div class="form-group">
@@ -928,7 +931,6 @@
                     
                     const updateData = {
                         question: formData.get('question'),
-                        image_url: formData.get('image_url'),
                         options: options,
                         correct_answer: formData.get('correct_answer'),
                         explanation: formData.get('explanation')
