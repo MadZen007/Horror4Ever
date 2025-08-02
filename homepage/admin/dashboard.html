@@ -674,7 +674,7 @@
         // View question details
         async function viewQuestionDetails(questionId) {
             try {
-                const response = await fetch(`/api/trivia/questions/${questionId}`);
+                const response = await fetch(`/api/trivia/questions?id=${questionId}`);
                 if (!response.ok) throw new Error('Failed to load question details');
                 
                 const question = await response.json();
