@@ -22,8 +22,7 @@ export default async function handler(req, res) {
       wrongAnswer3,
       imageUrl,
       explanation,
-      memberName,
-      memberIcon
+      memberToken
     } = req.body;
 
     // Validate required fields
@@ -34,9 +33,40 @@ export default async function handler(req, res) {
       });
     }
 
-    // Auto-generate member info if not provided
-    const finalMemberName = memberName || `Anonymous Member ${Date.now().toString().slice(-4)}`;
-    const finalMemberIcon = memberIcon || '';
+    // Validate member token
+    if (!memberToken) {
+      return res.status(401).json({
+        error: 'Authentication required',
+        details: 'Member login required to submit suggestions'
+      });
+    }
+
+    // Decode token to get member ID
+    let memberId;
+    try {
+      const decoded = Buffer.from(memberToken, 'base64').toString();
+      memberId = decoded.split(':')[0];
+    } catch (error) {
+      return res.status(401).json({
+        error: 'Invalid token',
+        details: 'Please log in again'
+      });
+    }
+
+    // Get member info from database
+    const memberResult = await pool.query(
+      'SELECT id, name, icon FROM members WHERE id = $1',
+      [memberId]
+    );
+
+    if (memberResult.rows.length === 0) {
+      return res.status(401).json({
+        error: 'Member not found',
+        details: 'Please log in again'
+      });
+    }
+
+    const member = memberResult.rows[0];
 
     // Create options array with correct answer in random position
     const options = [correctAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3];
@@ -63,8 +93,9 @@ export default async function handler(req, res) {
       1, // Default difficulty
       false, // Not approved yet
       JSON.stringify({
-        name: finalMemberName,
-        icon: finalMemberIcon,
+        name: member.name,
+        icon: member.icon || '',
+        memberId: member.id,
         submittedAt: new Date().toISOString()
       })
     ];
@@ -74,7 +105,7 @@ export default async function handler(req, res) {
     res.status(200).json({
       success: true,
       message: 'Suggestion submitted successfully! Your question will be reviewed and added to the game once approved.',
-      memberName: finalMemberName
+      memberName: member.name
     });
 
   } catch (error) {

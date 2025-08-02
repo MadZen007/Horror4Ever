@@ -736,4 +736,128 @@ body {
 .success-message .credits-info li {
   color: var(--text-light);
   margin-bottom: 5px;
+}
+
+/* Member Auth Styles */
+.member-auth-content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.member-auth-title {
+  color: var(--accent-orange);
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  text-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+}
+
+.member-auth-subtitle {
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+}
+
+.member-benefits {
+  background: rgba(30, 30, 30, 0.8);
+  border: 2px solid var(--accent-orange);
+  border-radius: 15px;
+  padding: 25px;
+  margin-bottom: 30px;
+  text-align: left;
+}
+
+.member-benefits h3 {
+  color: var(--accent-orange);
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.member-benefits ul {
+  list-style: none;
+  padding: 0;
+}
+
+.member-benefits li {
+  color: var(--text-light);
+  margin-bottom: 10px;
+  padding-left: 25px;
+  position: relative;
+}
+
+.member-benefits li::before {
+  content: '🎃';
+  position: absolute;
+  left: 0;
+  color: var(--accent-orange);
+}
+
+.auth-form-container {
+  background: rgba(30, 30, 30, 0.8);
+  border: 2px solid var(--accent-orange);
+  border-radius: 15px;
+  padding: 25px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.auth-form-container h3 {
+  color: var(--accent-orange);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.auth-button {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.auth-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+}
+
+.auth-footer {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.auth-footer p {
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+}
+
+/* Member Info Display */
+.member-info-display {
+  background: rgba(76, 175, 80, 0.1);
+  border: 2px solid #4CAF50;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.member-info-display p {
+  color: var(--text-light);
+  margin: 5px 0;
+}
+
+.member-info-display strong {
+  color: #4CAF50;
 } 

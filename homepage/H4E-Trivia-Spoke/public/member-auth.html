@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <title>Member Access - Horror4Ever</title>
+</head>
+<body>
+  <div class="game-container">
+    <!-- Header -->
+    <header class="game-header">
+      <a href="../../index.html" class="back-button">← Back to Home</a>
+      <div class="score-display">
+        <span class="score-label">Member Access</span>
+      </div>
+    </header>
+
+    <!-- Member Auth Screen -->
+    <div id="memberAuthScreen" class="screen active">
+      <div class="member-auth-content">
+        <h1 class="member-auth-title">🎃 MEMBER ACCESS REQUIRED 🎃</h1>
+        <p class="member-auth-subtitle">Only members can submit trivia questions, but it's FREE to join!</p>
+        
+        <div class="member-benefits">
+          <h3>🎁 Member Benefits:</h3>
+          <ul>
+            <li>Submit your own horror trivia questions</li>
+            <li>Get credited when your questions are approved</li>
+            <li>Access to exclusive content and features</li>
+            <li>Join our horror community</li>
+            <li>100% FREE - no hidden costs!</li>
+          </ul>
+        </div>
+
+        <!-- Login Form -->
+        <div class="auth-form-container">
+          <h3>Already a Member? Sign In:</h3>
+          <form id="loginForm" class="auth-form">
+            <div class="form-group">
+              <label for="loginEmail">Email:</label>
+              <input type="email" id="loginEmail" name="email" required>
+            </div>
+            <div class="form-group">
+              <label for="loginPassword">Password:</label>
+              <input type="password" id="loginPassword" name="password" required>
+            </div>
+            <button type="submit" class="auth-button">SIGN IN</button>
+          </form>
+        </div>
+
+        <!-- Signup Form -->
+        <div class="auth-form-container">
+          <h3>New Member? Sign Up (FREE):</h3>
+          <form id="signupForm" class="auth-form">
+            <div class="form-group">
+              <label for="signupName">Display Name:</label>
+              <input type="text" id="signupName" name="name" required placeholder="How you want to be known">
+            </div>
+            <div class="form-group">
+              <label for="signupEmail">Email:</label>
+              <input type="email" id="signupEmail" name="email" required>
+            </div>
+            <div class="form-group">
+              <label for="signupPassword">Password:</label>
+              <input type="password" id="signupPassword" name="password" required minlength="6">
+            </div>
+            <div class="form-group">
+              <label for="signupIcon">Profile Icon URL (Optional):</label>
+              <input type="url" id="signupIcon" name="icon" placeholder="https://example.com/your-icon.jpg">
+            </div>
+            <button type="submit" class="auth-button">JOIN FOR FREE</button>
+          </form>
+        </div>
+
+        <div class="auth-footer">
+          <p>By joining, you agree to our community guidelines and terms of service.</p>
+          <button class="cancel-button" onclick="window.location.href='index.html'">BACK TO GAME</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Handle login form
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      
+      try {
+        const response = await fetch('/api/trivia/member/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: formData.get('email'),
+            password: formData.get('password')
+          })
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          localStorage.setItem('horror4ever_member_token', result.token);
+          localStorage.setItem('horror4ever_member_name', result.member.name);
+          localStorage.setItem('horror4ever_member_icon', result.member.icon || '');
+          alert('Welcome back! You can now submit questions.');
+          window.location.href = 'index.html';
+        } else {
+          alert('Login failed. Please check your credentials.');
+        }
+      } catch (error) {
+        alert('Login failed. Please try again.');
+      }
+    });
+
+    // Handle signup form
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      
+      try {
+        const response = await fetch('/api/trivia/member/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: formData.get('name'),
+            email: formData.get('email'),
+            password: formData.get('password'),
+            icon: formData.get('icon') || ''
+          })
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          localStorage.setItem('horror4ever_member_token', result.token);
+          localStorage.setItem('horror4ever_member_name', result.member.name);
+          localStorage.setItem('horror4ever_member_icon', result.member.icon || '');
+          alert('Welcome to Horror4Ever! You can now submit questions.');
+          window.location.href = 'index.html';
+        } else {
+          const error = await response.json();
+          alert(`Signup failed: ${error.error}`);
+        }
+      } catch (error) {
+        alert('Signup failed. Please try again.');
+      }
+    });
+  </script>
+</body>
+</html> 

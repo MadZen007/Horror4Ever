@@ -130,16 +130,9 @@
             <textarea id="explanation" name="explanation" placeholder="Provide additional context or explanation for the correct answer..."></textarea>
           </div>
           
-          <div class="form-group">
-            <label for="memberName">Your Name (for credits):</label>
-            <input type="text" id="memberName" name="memberName" placeholder="How you want to be credited (optional)">
-            <small class="form-help">Leave blank to submit anonymously, or fill in to be credited for your contribution!</small>
-          </div>
-          
-          <div class="form-group">
-            <label for="memberIcon">Your Icon URL (Optional):</label>
-            <input type="url" id="memberIcon" name="memberIcon" placeholder="https://example.com/your-icon.jpg (optional)">
-            <small class="form-help">Your icon will appear next to your name when the question is approved.</small>
+          <div class="member-info-display">
+            <p><strong>Submitting as:</strong> <span id="memberDisplayName">Loading...</span></p>
+            <p><small>Your member info will be automatically included with your submission.</small></p>
           </div>
           
           <div class="form-buttons">
