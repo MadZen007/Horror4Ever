@@ -595,6 +595,27 @@
                 messageDiv.remove();
             }, 5000);
         }
+        
+        // Track admin dashboard visit
+        window.addEventListener('load', async () => {
+            try {
+                await fetch('/api/trivia/track', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'site_visit',
+                        data: {
+                            pageUrl: window.location.href,
+                            userAgent: navigator.userAgent,
+                            referrer: document.referrer || '',
+                            sessionId: 'admin-dashboard-' + Date.now()
+                        }
+                    })
+                });
+            } catch (error) {
+                console.log('Admin visit tracking failed:', error);
+            }
+        });
     </script>
 </body>
 </html> 
