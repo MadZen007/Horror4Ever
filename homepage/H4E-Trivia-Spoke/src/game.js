@@ -61,13 +61,38 @@ class HorrorTriviaGame {
     });
   }
 
-  startGame() {
-    this.gameQuestions = questionManager.getRandomQuestions(10);
-    this.currentQuestionIndex = 0;
-    this.totalScore = 0;
-    this.updateTotalScore();
-    this.showScreen(this.questionScreen);
-    this.loadQuestion();
+  async startGame() {
+    try {
+      // Show loading state
+      this.startButton.disabled = true;
+      this.startButton.textContent = 'Loading Questions...';
+      
+      // Fetch questions from database
+      const response = await fetch('/api/trivia/questions?limit=10&approved=true&random=true');
+      if (!response.ok) {
+        throw new Error('Failed to fetch questions');
+      }
+      
+      this.gameQuestions = await response.json();
+      
+      if (this.gameQuestions.length === 0) {
+        throw new Error('No questions available');
+      }
+      
+      this.currentQuestionIndex = 0;
+      this.totalScore = 0;
+      this.updateTotalScore();
+      this.showScreen(this.questionScreen);
+      this.loadQuestion();
+      
+    } catch (error) {
+      console.error('Error loading questions:', error);
+      alert('Failed to load questions. Please try again.');
+    } finally {
+      // Reset button
+      this.startButton.disabled = false;
+      this.startButton.textContent = 'Start Game';
+    }
   }
 
   loadQuestion() {
@@ -92,10 +117,20 @@ class HorrorTriviaGame {
       // If external image fails, fall back to placeholder
       this.questionImage.src = '../images/skeletonquestion.png';
     };
-    this.questionImage.src = this.currentQuestion.image;
+    this.questionImage.src = this.currentQuestion.image_url || '../images/skeletonquestion.png';
     
-    // Load options
-    this.currentQuestion.options.forEach((option, index) => {
+    // Load options (handle both array and JSON string formats)
+    let options = this.currentQuestion.options;
+    if (typeof options === 'string') {
+      try {
+        options = JSON.parse(options);
+      } catch (e) {
+        console.error('Error parsing options:', e);
+        options = [];
+      }
+    }
+    
+    options.forEach((option, index) => {
       const optionText = document.getElementById(`option${index}`);
       optionText.textContent = option;
       
@@ -152,8 +187,20 @@ class HorrorTriviaGame {
     
     const selectedButton = event.currentTarget;
     const selectedIndex = parseInt(selectedButton.dataset.option);
-    const selectedAnswer = this.currentQuestion.options[selectedIndex];
-    const isCorrect = selectedAnswer === this.currentQuestion.correctAnswer;
+    
+    // Handle options (could be array or JSON string)
+    let options = this.currentQuestion.options;
+    if (typeof options === 'string') {
+      try {
+        options = JSON.parse(options);
+      } catch (e) {
+        console.error('Error parsing options:', e);
+        options = [];
+      }
+    }
+    
+    const selectedAnswer = options[selectedIndex];
+    const isCorrect = selectedAnswer === this.currentQuestion.correct_answer;
     
     // Calculate score
     const pointsEarned = isCorrect ? this.calculateCurrentScore() : 0;
@@ -173,7 +220,7 @@ class HorrorTriviaGame {
     this.optionButtons.forEach((button, index) => {
       const optionText = button.querySelector('.option-text').textContent;
       
-      if (optionText === this.currentQuestion.correctAnswer) {
+      if (optionText === this.currentQuestion.correct_answer) {
         button.classList.add('correct');
       } else if (index === selectedIndex && !isCorrect) {
         button.classList.add('incorrect');
@@ -191,8 +238,8 @@ class HorrorTriviaGame {
     this.resultIcon.className = `result-icon ${isCorrect ? 'correct' : 'incorrect'}`;
     this.resultText.textContent = isCorrect ? 'CORRECT!' : 'INCORRECT!';
     this.resultText.className = `result-text ${isCorrect ? 'correct' : 'incorrect'}`;
-    this.correctAnswerText.textContent = this.currentQuestion.correctAnswer;
-    this.explanationText.textContent = this.currentQuestion.explanation;
+    this.correctAnswerText.textContent = this.currentQuestion.correct_answer;
+    this.explanationText.textContent = this.currentQuestion.explanation || '';
     this.pointsEarned.textContent = pointsEarned;
     
     this.updateTotalScore();
