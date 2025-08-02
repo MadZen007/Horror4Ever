@@ -308,8 +308,8 @@ class HorrorTriviaGame {
   }
 
   updateTotalScore() {
-    const maxPossibleScore = this.gameQuestions.length * 10;
-    const scoreText = `${this.correctAnswers} out of ${this.currentQuestionIndex} - Score ${this.totalScore} out of ${maxPossibleScore}`;
+    const currentMaxPossibleScore = this.currentQuestionIndex * 10;
+    const scoreText = `${this.correctAnswers} out of ${this.currentQuestionIndex} - Score ${this.totalScore} out of ${currentMaxPossibleScore}`;
     this.totalScoreDisplay.textContent = scoreText;
   }
 }
