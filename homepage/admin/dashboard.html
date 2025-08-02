@@ -529,6 +529,8 @@
                 
                 pendingQuestions = await response.json();
                 console.log('Pending questions loaded:', pendingQuestions);
+                console.log('Number of pending questions:', pendingQuestions.length);
+                console.log('All pending question IDs:', pendingQuestions.map(q => q.id));
                 console.log('First question ID:', pendingQuestions[0]?.id, 'Type:', typeof pendingQuestions[0]?.id);
                 displayQuestions('pending-questions', pendingQuestions, false);
                 
