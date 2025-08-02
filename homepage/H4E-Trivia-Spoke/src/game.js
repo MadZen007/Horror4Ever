@@ -258,12 +258,12 @@ class HorrorTriviaGame {
     this.explanationText.textContent = this.currentQuestion.explanation || '';
     this.pointsEarned.textContent = pointsEarned;
     
-    this.updateTotalScore();
     this.showScreen(this.answerScreen);
   }
 
   nextQuestion() {
     this.currentQuestionIndex++;
+    this.updateTotalScore();
     this.showScreen(this.questionScreen);
     this.loadQuestion();
   }
