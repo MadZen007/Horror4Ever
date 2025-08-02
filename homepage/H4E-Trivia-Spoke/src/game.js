@@ -4,6 +4,7 @@ class HorrorTriviaGame {
   constructor() {
     this.currentQuestionIndex = 0;
     this.totalScore = 0;
+    this.correctAnswers = 0;
     this.currentQuestion = null;
     this.gameQuestions = [];
     this.timer = null;
@@ -81,6 +82,7 @@ class HorrorTriviaGame {
       
       this.currentQuestionIndex = 0;
       this.totalScore = 0;
+      this.correctAnswers = 0;
       this.updateTotalScore();
       this.showScreen(this.questionScreen);
       this.loadQuestion();
@@ -206,6 +208,11 @@ class HorrorTriviaGame {
     const pointsEarned = isCorrect ? this.calculateCurrentScore() : 0;
     this.totalScore += pointsEarned;
     
+    // Track correct answers
+    if (isCorrect) {
+      this.correctAnswers++;
+    }
+    
     // Show answer feedback
     this.showAnswerFeedback(selectedIndex, isCorrect, pointsEarned);
   }
@@ -286,6 +293,7 @@ class HorrorTriviaGame {
   }
 
   restartGame() {
+    this.correctAnswers = 0;
     this.showScreen(this.startScreen);
   }
 
@@ -300,7 +308,9 @@ class HorrorTriviaGame {
   }
 
   updateTotalScore() {
-    this.totalScoreDisplay.textContent = this.totalScore;
+    const maxPossibleScore = this.gameQuestions.length * 10;
+    const scoreText = `${this.correctAnswers} out of ${this.currentQuestionIndex} - Score ${this.totalScore} out of ${maxPossibleScore}`;
+    this.totalScoreDisplay.textContent = scoreText;
   }
 }
 
