@@ -593,7 +593,6 @@ class HorrorTriviaGame {
     });
   }
 }
-}
 
 // Initialize the game when the page loads
 document.addEventListener('DOMContentLoaded', () => {
