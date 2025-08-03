@@ -7,6 +7,9 @@
     <title>H4E - Horror4Ever</title>
   </head>
   <body>
+    <!-- Top ad container -->
+    <div id="top-banner" class="ad-container"></div>
+    
     <header>
       <!-- Logo Hover Effect Container -->
       <div class="logo-hover-container">
@@ -43,6 +46,7 @@
     </main>
     <div class="support-about-row">
       <a href="https://ko-fi.com/ihearthorror" class="btn" target="_blank" rel="noopener noreferrer" aria-label="Support us on Ko-fi">Support Us on Ko-fi</a>
+                  <a href="subscription.html" class="btn" aria-label="Subscription" title="Help keep a horror-loving human fed! 🍕">🎃 Subscribe - $2/month</a>
       <a href="about.html" class="btn" aria-label="About Us">About Us</a>
       <!-- Placeholder: Add more info or buttons here as needed -->
     </div>
@@ -50,6 +54,8 @@
       <img src="images/ghost-swipe-cropped.png" alt="Ghost swipe animation" />
     </div>
     <script src="ghost-transition.js"></script>
+    <!-- Subscription Manager -->
+    <script src="js/subscription-manager.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
       const container = document.querySelector('.logo-hover-container');
@@ -242,6 +248,9 @@
         <p class="footer-copyright">© 2024 Horror4Ever. All rights reserved. | Made with 💀 by horror fans, for horror fans.</p>
       </div>
     </footer>
+    
+    <!-- Bottom ad container -->
+    <div id="bottom-banner" class="ad-container"></div>
     
     <button class="floating-meme-btn" id="meme-btn" aria-label="Show a random meme">
       <img src="images/3D pumpkin no bg.png" alt="Show a random meme" />
