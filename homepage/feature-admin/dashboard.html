@@ -600,6 +600,31 @@
             </div>
         </div>
 
+        <!-- Section Separator -->
+        <div class="section-separator"></div>
+
+        <!-- Movies Card Section -->
+        <div class="card-section">
+            <h2 class="section-title">🎬 Movies Card</h2>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="button-grid">
+                    <button class="admin-button" onclick="showAddMovieModal()">🎬 Add Movie</button>
+                    <a href="../feature-movies/public/index.html" class="admin-button">🎬 View Movies</a>
+                </div>
+            </div>
+
+            <!-- Movies Management -->
+            <div class="questions-section">
+                <h3 class="subsection-title">🎬 Movie Management</h3>
+                
+                <div class="questions-list" id="movies-list">
+                    <div class="loading">Loading movies...</div>
+                </div>
+            </div>
+        </div>
+
         <!-- General Site Section -->
         <div class="card-section">
             <h2 class="section-title">🏠 General Site</h2>
@@ -625,6 +650,7 @@
             loadStats();
             loadQuestions();
             loadArticles();
+            loadMovies();
         });
 
         // Load dashboard statistics
@@ -1396,6 +1422,267 @@
                 console.log('Admin visit tracking failed:', error);
             }
         });
+
+        // ===== MOVIES MANAGEMENT =====
+        
+        // Load movies
+        async function loadMovies() {
+            try {
+                const response = await fetch('/api/movies');
+                if (!response.ok) throw new Error('Failed to load movies');
+                
+                const movies = await response.json();
+                displayMovies(movies);
+                
+            } catch (error) {
+                console.error('Error loading movies:', error);
+                document.getElementById('movies-list').innerHTML = '<div class="error">Failed to load movies</div>';
+            }
+        }
+
+        // Display movies
+        function displayMovies(movies) {
+            const moviesList = document.getElementById('movies-list');
+            
+            if (!movies || movies.length === 0) {
+                moviesList.innerHTML = '<div class="empty">No movies found</div>';
+                return;
+            }
+            
+            moviesList.innerHTML = movies.map(movie => `
+                <div class="question-item">
+                    <div class="question-header">
+                        <div class="question-text">${movie.title} (${movie.year})</div>
+                        <div class="question-actions">
+                            <button class="view-btn" onclick="viewMovieDetails('${movie.id}')">👁️ View</button>
+                            <button class="edit-btn" onclick="editMovie('${movie.id}')">✏️ Edit</button>
+                            <button class="delete-btn" onclick="deleteMovie('${movie.id}')">🗑️ Delete</button>
+                        </div>
+                    </div>
+                    <div class="question-details">
+                        <strong>YouTube ID:</strong> ${movie.youtube_id}<br>
+                        <strong>Description:</strong> ${movie.description || 'No description'}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Show add movie modal
+        function showAddMovieModal() {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>🎬 Add New Movie</h3>
+                        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+                    </div>
+                    <form id="addMovieForm" class="modal-form">
+                        <div class="form-group">
+                            <label for="movieTitle">Title *</label>
+                            <input type="text" id="movieTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="movieYear">Year *</label>
+                            <input type="number" id="movieYear" min="1900" max="2030" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="movieYoutubeUrl">YouTube URL *</label>
+                            <input type="url" id="movieYoutubeUrl" placeholder="https://www.youtube.com/watch?v=..." required>
+                            <small>Paste the full YouTube URL - the video ID will be extracted automatically</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="movieDescription">Description</label>
+                            <textarea id="movieDescription" rows="3" placeholder="Optional description of the movie..."></textarea>
+                        </div>
+                        <div class="form-buttons">
+                            <button type="submit" class="admin-button">🎬 Add Movie</button>
+                            <button type="button" class="admin-button secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Handle form submission
+            document.getElementById('addMovieForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const movieData = {
+                    title: document.getElementById('movieTitle').value,
+                    year: parseInt(document.getElementById('movieYear').value),
+                    youtube_url: document.getElementById('movieYoutubeUrl').value,
+                    description: document.getElementById('movieDescription').value || null
+                };
+                
+                try {
+                    const response = await fetch('/api/movies', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(movieData)
+                    });
+                    
+                    if (!response.ok) throw new Error('Failed to add movie');
+                    
+                    showMessage('Movie added successfully!', 'success');
+                    modal.remove();
+                    loadMovies();
+                    
+                } catch (error) {
+                    console.error('Error adding movie:', error);
+                    showMessage('Failed to add movie', 'error');
+                }
+            });
+        }
+
+        // View movie details
+        async function viewMovieDetails(movieId) {
+            try {
+                const response = await fetch(`/api/movies?id=${movieId}`);
+                if (!response.ok) throw new Error('Failed to load movie details');
+                
+                const movie = await response.json();
+                
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>🎬 Movie Details</h3>
+                            <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="detail-group">
+                                <strong>Title:</strong> ${movie.title}
+                            </div>
+                            <div class="detail-group">
+                                <strong>Year:</strong> ${movie.year}
+                            </div>
+                            <div class="detail-group">
+                                <strong>YouTube ID:</strong> ${movie.youtube_id}
+                            </div>
+                            <div class="detail-group">
+                                <strong>Description:</strong> ${movie.description || 'No description'}
+                            </div>
+                            <div class="detail-group">
+                                <strong>Created:</strong> ${new Date(movie.created_at).toLocaleDateString()}
+                            </div>
+                            <div class="form-buttons">
+                                <button class="admin-button" onclick="editMovie('${movie.id}'); this.closest('.modal-overlay').remove()">✏️ Edit Movie</button>
+                                <button class="admin-button secondary" onclick="this.closest('.modal-overlay').remove()">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+                
+            } catch (error) {
+                console.error('Error loading movie details:', error);
+                showMessage('Failed to load movie details', 'error');
+            }
+        }
+
+        // Edit movie
+        async function editMovie(movieId) {
+            try {
+                const response = await fetch(`/api/movies?id=${movieId}`);
+                if (!response.ok) throw new Error('Failed to load movie for edit');
+                
+                const movie = await response.json();
+                
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>✏️ Edit Movie</h3>
+                            <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+                        </div>
+                        <form id="editMovieForm" class="modal-form">
+                            <div class="form-group">
+                                <label for="editMovieTitle">Title *</label>
+                                <input type="text" id="editMovieTitle" value="${movie.title}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editMovieYear">Year *</label>
+                                <input type="number" id="editMovieYear" value="${movie.year}" min="1900" max="2030" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editMovieYoutubeUrl">YouTube URL *</label>
+                                <input type="url" id="editMovieYoutubeUrl" value="https://www.youtube.com/watch?v=${movie.youtube_id}" required>
+                                <small>Paste the full YouTube URL - the video ID will be extracted automatically</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="editMovieDescription">Description</label>
+                                <textarea id="editMovieDescription" rows="3">${movie.description || ''}</textarea>
+                            </div>
+                            <div class="form-buttons">
+                                <button type="submit" class="admin-button">💾 Save Changes</button>
+                                <button type="button" class="admin-button secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+                
+                // Handle form submission
+                document.getElementById('editMovieForm').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const updateData = {
+                        title: document.getElementById('editMovieTitle').value,
+                        year: parseInt(document.getElementById('editMovieYear').value),
+                        youtube_url: document.getElementById('editMovieYoutubeUrl').value,
+                        description: document.getElementById('editMovieDescription').value || null
+                    };
+                    
+                    try {
+                        const updateResponse = await fetch(`/api/movies?id=${movieId}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(updateData)
+                        });
+                        
+                        if (!updateResponse.ok) throw new Error('Failed to update movie');
+                        
+                        showMessage('Movie updated successfully!', 'success');
+                        modal.remove();
+                        loadMovies();
+                        
+                    } catch (error) {
+                        console.error('Error updating movie:', error);
+                        showMessage('Failed to update movie', 'error');
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error loading movie for edit:', error);
+                showMessage('Failed to load movie details', 'error');
+            }
+        }
+
+        // Delete movie
+        async function deleteMovie(movieId) {
+            if (!confirm('Are you sure you want to delete this movie? This action cannot be undone.')) return;
+            
+            try {
+                const response = await fetch(`/api/movies?id=${movieId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) throw new Error('Failed to delete movie');
+                
+                showMessage('Movie deleted successfully!', 'success');
+                loadMovies();
+                
+            } catch (error) {
+                console.error('Error deleting movie:', error);
+                showMessage('Failed to delete movie', 'error');
+            }
+        }
     </script>
 </body>
 </html> 
