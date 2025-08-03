@@ -479,6 +479,8 @@
                 <div class="button-grid">
                     <a href="../import-questions.html" class="admin-button">📝 Import Questions</a>
                     <a href="../H4E-Trivia-Spoke/public/index.html" class="admin-button">🎮 Test Game</a>
+                    <a href="../feature-articles/public/submit.html" class="admin-button">✍️ Submit Article</a>
+                    <a href="../feature-articles/public/index.html" class="admin-button">📰 View Articles</a>
                     <a href="../index.html" class="admin-button">🏠 View Site</a>
                     <button class="admin-button secondary" onclick="refreshStats()">🔄 Refresh Stats</button>
                 </div>
