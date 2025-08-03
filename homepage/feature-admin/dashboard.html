@@ -75,18 +75,48 @@
             opacity: 0.8;
         }
 
-        .admin-sections {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+        .stats-section {
+            background: #111;
+            border: 2px solid #ff6600;
+            border-radius: 10px;
+            padding: 20px;
             margin-bottom: 30px;
         }
 
-        .admin-section {
+        .stats-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-section {
             background: #111;
             border: 2px solid #333;
             border-radius: 10px;
             padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .quick-actions {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #333;
+        }
+
+        .subsection-title {
+            color: #ff6600;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ff6600;
+            padding-bottom: 8px;
+        }
+
+        .section-separator {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff6600, transparent);
+            margin: 40px 0;
+            border-radius: 1px;
         }
 
         .section-title {
@@ -459,97 +489,126 @@
         </div>
 
         <!-- Stats Grid -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-number" id="totalQuestions">-</div>
-                <div class="stat-label">Total Questions</div>
+        <div class="stats-section">
+            <div class="stats-header">
+                <h2 class="section-title">📊 Site Statistics</h2>
+                <button class="admin-button secondary" onclick="refreshStats()">🔄 Refresh Stats</button>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="approvedQuestions">-</div>
-                <div class="stat-label">Approved Questions</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="pendingQuestions">-</div>
-                <div class="stat-label">Pending Questions</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="totalGames">-</div>
-                <div class="stat-label">Games Played</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="totalVisits">-</div>
-                <div class="stat-label">Site Visits</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="avgScore">-</div>
-                <div class="stat-label">Average Score</div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalQuestions">-</div>
+                    <div class="stat-label">Total Questions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="approvedQuestions">-</div>
+                    <div class="stat-label">Approved Questions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="pendingQuestions">-</div>
+                    <div class="stat-label">Pending Questions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalGames">-</div>
+                    <div class="stat-label">Games Played</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalVisits">-</div>
+                    <div class="stat-label">Site Visits</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="avgScore">-</div>
+                    <div class="stat-label">Average Score</div>
+                </div>
             </div>
         </div>
 
-        <!-- Admin Actions -->
-        <div class="admin-sections">
-            <div class="admin-section">
-                <h2 class="section-title">📊 Quick Actions</h2>
+        <!-- Section Separator -->
+        <div class="section-separator"></div>
+
+        <!-- Trivia Card Section -->
+        <div class="card-section">
+            <h2 class="section-title">🎮 Trivia Card</h2>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
                 <div class="button-grid">
                     <a href="../import-questions.html" class="admin-button">📝 Import Questions</a>
                     <a href="../H4E-Trivia-Spoke/public/index.html" class="admin-button">🎮 Test Game</a>
-                    <a href="../feature-articles/public/submit.html" class="admin-button">✍️ Submit Article</a>
-                    <a href="../feature-articles/public/index.html" class="admin-button">📰 View Articles</a>
-                    <a href="../index.html" class="admin-button">🏠 View Site</a>
-                    <button class="admin-button secondary" onclick="refreshStats()">🔄 Refresh Stats</button>
-                </div>
-            </div>
-
-            <div class="admin-section">
-                <h2 class="section-title">⚙️ Database Management</h2>
-                <div class="button-grid">
                     <button class="admin-button secondary" onclick="exportQuestions()">📤 Export Questions</button>
-                    <button class="admin-button secondary" onclick="backupDatabase()">💾 Backup Database</button>
                     <button class="admin-button danger" onclick="clearPending()">🗑️ Clear Pending</button>
                 </div>
             </div>
+
+            <!-- Questions Management -->
+            <div class="questions-section">
+                <h3 class="subsection-title">❓ Question Management</h3>
+                
+                <div class="questions-tabs">
+                    <button class="tab-button active" onclick="showTab('approved')">✅ Approved Questions</button>
+                    <button class="tab-button" onclick="showTab('pending')">⏳ Pending Questions</button>
+                </div>
+
+                <div id="approved-tab" class="tab-content">
+                    <div class="questions-list" id="approved-questions">
+                        <div class="loading">Loading approved questions...</div>
+                    </div>
+                </div>
+
+                <div id="pending-tab" class="tab-content" style="display: none;">
+                    <div class="questions-list" id="pending-questions">
+                        <div class="loading">Loading pending questions...</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Questions Management -->
-        <div class="questions-section">
-            <h2 class="section-title">❓ Question Management</h2>
-            
-            <div class="questions-tabs">
-                <button class="tab-button active" onclick="showTab('approved')">✅ Approved Questions</button>
-                <button class="tab-button" onclick="showTab('pending')">⏳ Pending Questions</button>
-            </div>
+        <!-- Section Separator -->
+        <div class="section-separator"></div>
 
-            <div id="approved-tab" class="tab-content">
-                <div class="questions-list" id="approved-questions">
-                    <div class="loading">Loading approved questions...</div>
+        <!-- Articles Card Section -->
+        <div class="card-section">
+            <h2 class="section-title">📰 Articles Card</h2>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="button-grid">
+                    <a href="../feature-articles/public/submit.html" class="admin-button">✍️ Submit Article</a>
+                    <a href="../feature-articles/public/index.html" class="admin-button">📰 View Articles</a>
                 </div>
             </div>
 
-            <div id="pending-tab" class="tab-content" style="display: none;">
-                <div class="questions-list" id="pending-questions">
-                    <div class="loading">Loading pending questions...</div>
+            <!-- Articles Management -->
+            <div class="questions-section">
+                <h3 class="subsection-title">📰 Article Management</h3>
+                
+                <div class="questions-tabs">
+                    <button class="tab-button active" onclick="showArticlesTab('published')">✅ Published Articles</button>
+                    <button class="tab-button" onclick="showArticlesTab('draft')">📝 Draft Articles</button>
+                </div>
+
+                <div id="published-tab" class="tab-content">
+                    <div class="questions-list" id="published-articles">
+                        <div class="loading">Loading published articles...</div>
+                    </div>
+                </div>
+
+                <div id="draft-tab" class="tab-content" style="display: none;">
+                    <div class="questions-list" id="draft-articles">
+                        <div class="loading">Loading draft articles...</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Articles Management -->
-        <div class="questions-section">
-            <h2 class="section-title">📰 Article Management</h2>
+        <!-- General Site Section -->
+        <div class="card-section">
+            <h2 class="section-title">🏠 General Site</h2>
             
-            <div class="questions-tabs">
-                <button class="tab-button active" onclick="showArticlesTab('published')">✅ Published Articles</button>
-                <button class="tab-button" onclick="showArticlesTab('draft')">📝 Draft Articles</button>
-            </div>
-
-            <div id="published-tab" class="tab-content">
-                <div class="questions-list" id="published-articles">
-                    <div class="loading">Loading published articles...</div>
-                </div>
-            </div>
-
-            <div id="draft-tab" class="tab-content" style="display: none;">
-                <div class="questions-list" id="draft-articles">
-                    <div class="loading">Loading draft articles...</div>
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="button-grid">
+                    <a href="../index.html" class="admin-button">🏠 View Site</a>
+                    <button class="admin-button secondary" onclick="backupDatabase()">💾 Backup Database</button>
                 </div>
             </div>
         </div>
