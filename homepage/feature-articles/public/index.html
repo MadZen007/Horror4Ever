@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Horror Articles - Horror4Ever</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="articles-container">
+    <!-- Header -->
+    <header class="articles-header">
+      <a href="../../index.html" class="back-button">← Back to Home</a>
+      <div class="header-content">
+        <h1 class="articles-title">🎃 HORROR ARTICLES 🎃</h1>
+        <p class="articles-subtitle">Dive into the darkest corners of horror culture</p>
+      </div>
+      <div class="admin-menu">
+        <button id="adminButton" class="admin-button" onclick="toggleAdminMenu()">⚙️ Admin</button>
+        <div id="adminDropdown" class="admin-dropdown" style="display: none;">
+          <a href="submit.html" class="dropdown-item">📝 Submit Article</a>
+          <a href="manage.html" class="dropdown-item">📊 Manage Articles</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Loading articles...</p>
+    </div>
+
+    <!-- Articles Grid -->
+    <div id="articlesGrid" class="articles-grid" style="display: none;">
+      <!-- Articles will be populated here -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="empty-state" style="display: none;">
+      <div class="empty-content">
+        <h2>No Articles Yet</h2>
+        <p>Be the first to share your horror knowledge!</p>
+        <a href="submit.html" class="submit-button">Submit First Article</a>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="error-state" style="display: none;">
+      <div class="error-content">
+        <h2>Error Loading Articles</h2>
+        <p id="errorMessage">Something went wrong. Please try again.</p>
+        <button onclick="loadArticles()" class="retry-button">Retry</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../src/articles.js"></script>
+  <script>
+    // Toggle admin dropdown menu
+    function toggleAdminMenu() {
+      const dropdown = document.getElementById('adminDropdown');
+      dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+      const adminMenu = document.querySelector('.admin-menu');
+      const dropdown = document.getElementById('adminDropdown');
+      
+      if (!adminMenu.contains(event.target)) {
+        dropdown.style.display = 'none';
+      }
+    });
+
+    // Load articles on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadArticles();
+    });
+  </script>
+</body>
+</html> 
