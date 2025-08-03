@@ -139,11 +139,14 @@
       button.textContent = 'Creating Table...';
       resultDiv.style.display = 'none';
       
-      try {
-        const response = await fetch('/api/dev-tools/setup-articles', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
-        });
+              try {
+            const response = await fetch('/api/dev-tools/setup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ action: 'setup-articles' })
+            });
         
         const result = await response.json();
         

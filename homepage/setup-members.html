@@ -76,9 +76,12 @@
             resultDiv.textContent = 'Setting up members table...';
             
             try {
-                const response = await fetch('/api/dev-tools/setup-members', {
+                const response = await fetch('/api/dev-tools/setup', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ action: 'setup-members' })
                 });
                 
                 const result = await response.json();

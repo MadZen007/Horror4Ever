@@ -135,11 +135,12 @@
             message.style.display = 'none';
             
             try {
-                const response = await fetch('/api/dev-tools/setup-movies', {
+                const response = await fetch('/api/dev-tools/setup', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    body: JSON.stringify({ action: 'setup-movies' })
                 });
                 
                 const result = await response.json();

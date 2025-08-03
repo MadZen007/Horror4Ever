@@ -163,12 +163,15 @@
                 showResult('Starting import...', 'success');
 
                 // Send to API
-                const response = await fetch('/api/dev-tools/import', {
+                const response = await fetch('/api/dev-tools/setup', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ questions })
+                    body: JSON.stringify({ 
+                        action: 'import-questions',
+                        questions: questions 
+                    })
                 });
 
                 const result = await response.json();
