@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Article - Horror4Ever</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .article-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .article-header {
+      margin-bottom: 30px;
+    }
+    
+    .article-title {
+      font-size: 2.5rem;
+      color: var(--accent-orange);
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+    }
+    
+    .article-meta {
+      display: flex;
+      gap: 20px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+    
+    .article-thumbnail {
+      width: 100%;
+      max-height: 400px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      border: 2px solid var(--accent-orange);
+    }
+    
+    .article-content {
+      line-height: 1.8;
+      font-size: 1.1rem;
+    }
+    
+    .article-content h1,
+    .article-content h2,
+    .article-content h3 {
+      color: var(--accent-orange);
+      margin-top: 30px;
+      margin-bottom: 15px;
+    }
+    
+    .article-content p {
+      margin-bottom: 20px;
+    }
+    
+    .article-content a {
+      color: var(--accent-orange);
+      text-decoration: underline;
+    }
+    
+    .article-content a:hover {
+      color: var(--accent-green);
+    }
+    
+    .article-tags {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+    }
+    
+    .article-tag {
+      display: inline-block;
+      background: var(--accent-orange);
+      color: var(--dark-bg);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .loading-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    
+    .loading-spinner {
+      border: 4px solid var(--border-color);
+      border-top: 4px solid var(--accent-orange);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .error-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--accent-red);
+    }
+  </style>
+</head>
+<body>
+  <div class="articles-container">
+    <!-- Header -->
+    <header class="articles-header">
+      <a href="index.html" class="back-button">← Back to Articles</a>
+      <div class="header-content">
+        <h1 class="articles-title">🎃 HORROR ARTICLES 🎃</h1>
+        <p class="articles-subtitle">Dive into the darkest corners of horror culture</p>
+      </div>
+    </header>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Loading article...</p>
+    </div>
+
+    <!-- Article Content -->
+    <div id="articleContent" class="article-container" style="display: none;">
+      <!-- Article will be loaded here -->
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="error-state" style="display: none;">
+      <h2>Article Not Found</h2>
+      <p id="errorMessage">The article you're looking for doesn't exist.</p>
+      <a href="index.html" class="submit-button">Back to Articles</a>
+    </div>
+  </div>
+
+  <script src="../src/articles.js"></script>
+  <script>
+    // Get article slug from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const slug = urlParams.get('slug');
+    
+    if (!slug) {
+      showError('No article specified');
+    } else {
+      loadArticle(slug);
+    }
+    
+    async function loadArticle(slug) {
+      const loadingState = document.getElementById('loadingState');
+      const articleContent = document.getElementById('articleContent');
+      const errorState = document.getElementById('errorState');
+      
+      try {
+        const article = await ArticlesModule.loadArticle(slug);
+        
+        if (!article) {
+          throw new Error('Article not found');
+        }
+        
+        // Hide loading, show content
+        loadingState.style.display = 'none';
+        articleContent.style.display = 'block';
+        
+        // Update page title
+        document.title = `${article.title} - Horror4Ever`;
+        
+        // Create article HTML
+        const formattedDate = new Date(article.date).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        
+        const tagsHTML = article.tags && article.tags.length > 0
+          ? `<div class="article-tags">
+               ${article.tags.map(tag => `<span class="article-tag">${tag}</span>`).join('')}
+             </div>`
+          : '';
+        
+        const thumbnailHTML = article.thumbnail 
+          ? `<img src="${article.thumbnail}" alt="${article.title}" class="article-thumbnail">`
+          : '';
+        
+        articleContent.innerHTML = `
+          <div class="article-header">
+            <h1 class="article-title">${article.title}</h1>
+            <div class="article-meta">
+              <span>By ${article.author}</span>
+              <span>${formattedDate}</span>
+            </div>
+            ${thumbnailHTML}
+          </div>
+          
+          <div class="article-content">
+            ${ArticlesModule.formatArticleContent(article.content)}
+          </div>
+          
+          ${tagsHTML}
+        `;
+        
+      } catch (error) {
+        console.error('Error loading article:', error);
+        showError('Failed to load article. Please try again.');
+      }
+    }
+    
+    function showError(message) {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('errorState').style.display = 'block';
+      document.getElementById('errorMessage').textContent = message;
+    }
+  </script>
+</body>
+</html> 
