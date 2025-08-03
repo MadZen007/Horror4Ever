@@ -15,6 +15,13 @@
         <span class="score-label">Score:</span>
         <span class="score-value" id="totalScore">0</span>
       </div>
+      <div class="account-menu">
+        <button id="accountButton" class="account-button" onclick="toggleAccountMenu()">👤 Account</button>
+        <div id="accountDropdown" class="account-dropdown" style="display: none;">
+          <a href="profile.html" class="dropdown-item">📝 Edit Profile</a>
+          <a href="member-auth.html" class="dropdown-item">🔐 Login/Logout</a>
+        </div>
+      </div>
     </header>
 
     <!-- Game Start Screen -->
@@ -210,7 +217,7 @@
 
         </script>
 
-        <!-- Site visit tracking -->
+        <!-- Site visit tracking and profile prompt -->
         <script>
           // Track page visit when page loads
           window.addEventListener('load', async () => {
@@ -228,8 +235,49 @@
                   }
                 })
               });
+              
+              // Check if user just signed up and show profile prompt
+              checkForProfilePrompt();
             } catch (error) {
               console.log('Site visit tracking failed:', error);
+            }
+          });
+          
+          // Check if user should see profile customization prompt
+          function checkForProfilePrompt() {
+            const memberToken = localStorage.getItem('horror4ever_member_token');
+            const memberName = localStorage.getItem('horror4ever_member_name');
+            const hasSeenProfilePrompt = localStorage.getItem('horror4ever_profile_prompt_shown');
+            
+            // If user is logged in and hasn't seen the prompt yet
+            if (memberToken && memberName && !hasSeenProfilePrompt) {
+              // Wait a moment for the page to load, then show prompt
+              setTimeout(() => {
+                const message = `Welcome to Horror4Ever, ${memberName}! 🎃\n\nWould you like to personalize your profile now?\n\nYou can edit your profile anytime by going to your account in settings.`;
+                
+                if (confirm(message)) {
+                  window.location.href = 'profile.html';
+                } else {
+                  // Mark that they've seen the prompt
+                  localStorage.setItem('horror4ever_profile_prompt_shown', 'true');
+                }
+              }, 2000); // Wait 2 seconds after page load
+            }
+          }
+          
+          // Toggle account dropdown menu
+          function toggleAccountMenu() {
+            const dropdown = document.getElementById('accountDropdown');
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+          }
+          
+          // Close dropdown when clicking outside
+          document.addEventListener('click', function(event) {
+            const accountMenu = document.querySelector('.account-menu');
+            const dropdown = document.getElementById('accountDropdown');
+            
+            if (!accountMenu.contains(event.target)) {
+              dropdown.style.display = 'none';
             }
           });
         </script>
