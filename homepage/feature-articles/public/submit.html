@@ -421,8 +421,18 @@
         });
         
         console.log('API response status:', response.status);
-        const result = await response.json();
-        console.log('API response:', result);
+        console.log('API response headers:', response.headers);
+        
+        let result;
+        try {
+          result = await response.json();
+          console.log('API response:', result);
+        } catch (parseError) {
+          console.error('Error parsing API response:', parseError);
+          const responseText = await response.text();
+          console.log('Raw response text:', responseText);
+          throw new Error('Invalid API response');
+        }
         
         if (response.ok) {
           messageDiv.className = 'message success';
