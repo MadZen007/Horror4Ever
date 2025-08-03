@@ -127,10 +127,12 @@ async function handleCreate(req, res) {
     
   } catch (error) {
     console.error('Error creating movie:', error);
+    console.error('Error stack:', error.stack);
     res.status(500).json({
       success: false,
       error: 'Failed to create movie',
-      details: error.message
+      details: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 }
