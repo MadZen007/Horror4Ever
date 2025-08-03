@@ -170,7 +170,16 @@
           localStorage.setItem('horror4ever_member_name', result.member.name);
           localStorage.setItem('horror4ever_member_icon', result.member.icon || '');
           alert('Welcome to Horror4Ever! You can now submit questions.');
-          window.location.href = 'index.html';
+          
+          // Check if they came from the suggestions button
+          const referrer = document.referrer;
+          if (referrer.includes('fun.html') || referrer.includes('index.html')) {
+            // They came from the game/suggestions, take them to the game
+            window.location.href = 'index.html';
+          } else {
+            // They came from elsewhere, take them to homepage
+            window.location.href = '../../index.html';
+          }
         } else {
           const error = await response.json();
           alert(`Signup failed: ${error.error}`);

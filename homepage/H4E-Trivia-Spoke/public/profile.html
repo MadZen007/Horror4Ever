@@ -332,7 +332,8 @@
     // Load user stats
     async function loadUserStats() {
       try {
-        const response = await fetch(`/api/trivia/member/signup?memberToken=${localStorage.getItem('horror4ever_member_token')}`, {
+        const memberToken = localStorage.getItem('horror4ever_member_token');
+        const response = await fetch(`/api/trivia/member/signup?memberToken=${memberToken}`, {
           method: 'GET'
         });
 
@@ -353,7 +354,8 @@
     // Load user profile
     async function loadUserProfile() {
       try {
-        const response = await fetch(`/api/trivia/member/login?memberToken=${localStorage.getItem('horror4ever_member_token')}`, {
+        const memberToken = localStorage.getItem('horror4ever_member_token');
+        const response = await fetch(`/api/trivia/member/login?memberToken=${memberToken}`, {
           method: 'GET'
         });
 
