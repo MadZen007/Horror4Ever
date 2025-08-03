@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit Article - Horror4Ever</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Additional styles for submission form */
+    .submit-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .submit-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .submit-title {
+      font-size: 2.5rem;
+      color: var(--accent-orange);
+      margin-bottom: 0.5rem;
+    }
+    
+    .submit-subtitle {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    
+    .submit-form {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 12px;
+      border: 2px solid #333;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+      color: var(--accent-orange);
+    }
+    
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #333;
+      border-radius: 8px;
+      background: var(--darker-bg);
+      color: var(--text-light);
+      font-family: inherit;
+      font-size: 1rem;
+    }
+    
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--accent-orange);
+      box-shadow: 0 0 10px rgba(255, 117, 24, 0.3);
+    }
+    
+    .form-group textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    
+    .tags-input {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      border: 2px solid #333;
+      border-radius: 8px;
+      background: var(--darker-bg);
+      min-height: 50px;
+    }
+    
+    .tag {
+      background: var(--accent-orange);
+      color: var(--dark-bg);
+      padding: 0.25rem 0.75rem;
+      border-radius: 15px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .tag-remove {
+      background: none;
+      border: none;
+      color: var(--dark-bg);
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1.2rem;
+      padding: 0;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .tag-input {
+      border: none;
+      background: none;
+      color: var(--text-light);
+      outline: none;
+      flex: 1;
+      min-width: 100px;
+    }
+    
+    .thumbnail-preview {
+      max-width: 200px;
+      max-height: 200px;
+      border-radius: 8px;
+      margin-top: 0.5rem;
+      border: 2px solid #333;
+    }
+    
+    .form-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+    
+    .submit-button {
+      background: linear-gradient(135deg, var(--accent-green), #22AA22);
+      color: var(--dark-bg);
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .submit-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(68, 255, 68, 0.4);
+    }
+    
+    .submit-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .cancel-button {
+      background: linear-gradient(135deg, #666, #444);
+      color: var(--text-light);
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .cancel-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(102, 102, 102, 0.4);
+    }
+    
+    .message {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    
+    .message.success {
+      background: rgba(68, 255, 68, 0.1);
+      border: 2px solid var(--accent-green);
+      color: var(--accent-green);
+    }
+    
+    .message.error {
+      background: rgba(255, 68, 68, 0.1);
+      border: 2px solid var(--accent-red);
+      color: var(--accent-red);
+    }
+    
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .form-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="articles-container">
+    <!-- Header -->
+    <header class="articles-header">
+      <a href="index.html" class="back-button">← Back to Articles</a>
+      <div class="header-content">
+        <h1 class="articles-title">✍️ SUBMIT ARTICLE</h1>
+        <p class="articles-subtitle">Share your horror knowledge with the community</p>
+      </div>
+    </header>
+
+    <div class="submit-container">
+      <div class="submit-header">
+        <h2 class="submit-title">🎃 Create New Article 🎃</h2>
+        <p class="submit-subtitle">Fill out the form below to submit your horror article</p>
+      </div>
+
+      <!-- Message Display -->
+      <div id="message" class="message"></div>
+
+      <!-- Submission Form -->
+      <form id="articleForm" class="submit-form">
+        <div class="form-group">
+          <label for="title">Article Title *</label>
+          <input type="text" id="title" name="title" required placeholder="Enter your article title...">
+        </div>
+
+        <div class="form-group">
+          <label for="slug">URL Slug *</label>
+          <input type="text" id="slug" name="slug" required placeholder="article-url-slug">
+          <small style="color: var(--text-muted);">This will be the URL for your article. Use only letters, numbers, and hyphens.</small>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="author">Author *</label>
+            <input type="text" id="author" name="author" required placeholder="Your name">
+          </div>
+          <div class="form-group">
+            <label for="date">Publication Date</label>
+            <input type="date" id="date" name="date">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="summary">Summary</label>
+          <textarea id="summary" name="summary" placeholder="Brief summary of your article (1-2 sentences)..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="thumbnail">Thumbnail Image</label>
+          <input type="file" id="thumbnail" name="thumbnail" accept="image/*" onchange="previewThumbnail(this)">
+          <img id="thumbnailPreview" class="thumbnail-preview" style="display: none;">
+        </div>
+
+        <div class="form-group">
+          <label for="tags">Tags</label>
+          <div class="tags-input" id="tagsContainer">
+            <input type="text" id="tagInput" class="tag-input" placeholder="Type a tag and press Enter...">
+          </div>
+          <small style="color: var(--text-muted);">Press Enter to add tags. Click the X to remove them.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="content">Article Content *</label>
+          <textarea id="content" name="content" required placeholder="Write your article content here... You can use basic markdown formatting like **bold**, *italic*, and [links](url)."></textarea>
+          <small style="color: var(--text-muted);">Supports basic markdown: **bold**, *italic*, [links](url), # headers</small>
+        </div>
+
+        <div class="form-buttons">
+          <button type="submit" class="submit-button" id="submitButton">PUBLISH ARTICLE</button>
+          <a href="index.html" class="cancel-button">CANCEL</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../src/articles.js"></script>
+  <script>
+    let tags = [];
+    
+    // Auto-generate slug from title
+    document.getElementById('title').addEventListener('input', function() {
+      const title = this.value;
+      const slug = generateSlug(title);
+      document.getElementById('slug').value = slug;
+    });
+    
+    // Set default date to today
+    document.getElementById('date').value = new Date().toISOString().split('T')[0];
+    
+    // Handle tag input
+    document.getElementById('tagInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const tag = this.value.trim();
+        if (tag && !tags.includes(tag)) {
+          tags.push(tag);
+          renderTags();
+          this.value = '';
+        }
+      }
+    });
+    
+    // Render tags
+    function renderTags() {
+      const container = document.getElementById('tagsContainer');
+      const input = document.getElementById('tagInput');
+      
+      // Clear container except input
+      container.innerHTML = '';
+      
+      // Add tags
+      tags.forEach(tag => {
+        const tagElement = document.createElement('span');
+        tagElement.className = 'tag';
+        tagElement.innerHTML = `
+          ${tag}
+          <button type="button" class="tag-remove" onclick="removeTag('${tag}')">&times;</button>
+        `;
+        container.appendChild(tagElement);
+      });
+      
+      // Add input back
+      container.appendChild(input);
+      input.focus();
+    }
+    
+    // Remove tag
+    function removeTag(tagToRemove) {
+      tags = tags.filter(tag => tag !== tagToRemove);
+      renderTags();
+    }
+    
+    // Preview thumbnail
+    function previewThumbnail(input) {
+      const preview = document.getElementById('thumbnailPreview');
+      
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+      } else {
+        preview.style.display = 'none';
+      }
+    }
+    
+    // Handle form submission
+    document.getElementById('articleForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const submitButton = document.getElementById('submitButton');
+      const messageDiv = document.getElementById('message');
+      
+      // Disable submit button
+      submitButton.disabled = true;
+      submitButton.textContent = 'Publishing...';
+      messageDiv.style.display = 'none';
+      
+      try {
+        const formData = new FormData(this);
+        
+        // Handle thumbnail upload
+        const thumbnailFile = formData.get('thumbnail');
+        let thumbnailData = '';
+        
+        if (thumbnailFile && thumbnailFile.size > 0) {
+          const reader = new FileReader();
+          thumbnailData = await new Promise((resolve) => {
+            reader.onload = function(e) {
+              resolve(e.target.result);
+            };
+            reader.readAsDataURL(thumbnailFile);
+          });
+        }
+        
+        // Prepare article data
+        const articleData = {
+          title: formData.get('title'),
+          slug: formData.get('slug'),
+          author: formData.get('author'),
+          date: formData.get('date'),
+          summary: formData.get('summary'),
+          content: formData.get('content'),
+          thumbnail: thumbnailData,
+          tags: tags
+        };
+        
+        // Submit to API
+        const response = await fetch('/api/articles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(articleData)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+          messageDiv.className = 'message success';
+          messageDiv.innerHTML = `
+            <strong>✅ Article Created Successfully!</strong><br>
+            ${result.message}<br>
+            <small>Your article is now saved and ready for review.</small>
+          `;
+          messageDiv.style.display = 'block';
+          
+          // Reset form
+          this.reset();
+          tags = [];
+          renderTags();
+          document.getElementById('thumbnailPreview').style.display = 'none';
+          
+        } else {
+          throw new Error(result.error || 'Failed to create article');
+        }
+        
+      } catch (error) {
+        console.error('Submission error:', error);
+        messageDiv.className = 'message error';
+        messageDiv.innerHTML = `
+          <strong>❌ Error:</strong><br>
+          ${error.message}<br>
+          <small>Please check your input and try again.</small>
+        `;
+        messageDiv.style.display = 'block';
+      } finally {
+        // Re-enable submit button
+        submitButton.disabled = false;
+        submitButton.textContent = 'PUBLISH ARTICLE';
+      }
+    });
+  </script>
+</body>
+</html> 
