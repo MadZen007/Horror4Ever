@@ -332,12 +332,8 @@
     // Load user stats
     async function loadUserStats() {
       try {
-        const response = await fetch('/api/trivia/member/stats', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            memberToken: localStorage.getItem('horror4ever_member_token')
-          })
+        const response = await fetch(`/api/trivia/member/signup?memberToken=${localStorage.getItem('horror4ever_member_token')}`, {
+          method: 'GET'
         });
 
         if (response.ok) {
@@ -357,12 +353,8 @@
     // Load user profile
     async function loadUserProfile() {
       try {
-        const response = await fetch('/api/trivia/member/profile', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            memberToken: localStorage.getItem('horror4ever_member_token')
-          })
+        const response = await fetch(`/api/trivia/member/login?memberToken=${localStorage.getItem('horror4ever_member_token')}`, {
+          method: 'GET'
         });
 
         if (response.ok) {
@@ -454,8 +446,8 @@
       }
       
       try {
-        const response = await fetch('/api/trivia/member/update-profile', {
-          method: 'POST',
+        const response = await fetch('/api/trivia/member/login', {
+          method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             memberToken: localStorage.getItem('horror4ever_member_token'),

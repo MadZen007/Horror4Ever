@@ -9,10 +9,28 @@ const pool = new Pool({
 });
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  const { method } = req;
 
+  try {
+    switch (method) {
+      case 'POST':
+        await handleSetupMembers(req, res);
+        break;
+      case 'PUT':
+        await handleUpdateSchema(req, res);
+        break;
+      default:
+        res.setHeader('Allow', ['POST', 'PUT']);
+        res.status(405).end(`Method ${req.method} Not Allowed`);
+    }
+  } catch (error) {
+    console.error('Setup API Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
+// POST - Setup members table
+async function handleSetupMembers(req, res) {
   try {
     // Create members table
     const createMembersTable = `
@@ -22,6 +40,7 @@ export default async function handler(req, res) {
         email VARCHAR(255) UNIQUE NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
         icon TEXT DEFAULT '',
+        profile_data JSONB DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
@@ -48,5 +67,26 @@ export default async function handler(req, res) {
       error: 'Failed to create members table',
       details: error.message
     });
+  }
+}
+
+// PUT - Update schema
+async function handleUpdateSchema(req, res) {
+  try {
+    // Add profile_data column to members table
+    const addColumnSQL = `
+      ALTER TABLE members 
+      ADD COLUMN IF NOT EXISTS profile_data JSONB DEFAULT NULL
+    `;
+    
+    await pool.query(addColumnSQL);
+    
+    res.status(200).json({ 
+      success: true, 
+      message: 'Database schema updated successfully! Added profile_data column.' 
+    });
+  } catch (error) {
+    console.error('Schema update error:', error);
+    res.status(500).json({ error: 'Failed to update database schema' });
   }
 } 

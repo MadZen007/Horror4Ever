@@ -106,8 +106,8 @@
             resultDiv.textContent = 'Updating schema...';
             
             try {
-                const response = await fetch('/api/trivia/update-profile-schema', {
-                    method: 'POST',
+                const response = await fetch('/api/trivia/setup-members', {
+                    method: 'PUT',
                     headers: { 'Content-Type': 'application/json' }
                 });
                 
