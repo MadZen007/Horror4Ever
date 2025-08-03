@@ -41,9 +41,9 @@ async function handleGet(req, res) {
     const { slug, published } = req.query;
     
     if (slug) {
-      // Get specific article by slug
+      // Get specific article by slug (temporarily allow unpublished for debugging)
       const result = await pool.query(
-        'SELECT * FROM articles WHERE slug = $1 AND is_published = true',
+        'SELECT * FROM articles WHERE slug = $1',
         [slug]
       );
       
@@ -51,7 +51,14 @@ async function handleGet(req, res) {
         return res.status(404).json({ error: 'Article not found' });
       }
       
-      res.status(200).json(result.rows[0]);
+      const article = result.rows[0];
+      
+      // If article exists but isn't published, return it anyway for now
+      if (!article.is_published) {
+        console.log('Article found but not published:', article.slug);
+      }
+      
+      res.status(200).json(article);
     } else {
       // Get all articles (show both published and unpublished for now)
       const query = 'SELECT * FROM articles ORDER BY date DESC, created_at DESC';
@@ -61,6 +68,7 @@ async function handleGet(req, res) {
     }
   } catch (error) {
     console.error('Error fetching articles:', error);
+    console.error('Request query:', req.query);
     res.status(500).json({ error: 'Failed to fetch articles' });
   }
 }

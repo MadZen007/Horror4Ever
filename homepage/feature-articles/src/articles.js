@@ -163,7 +163,7 @@ function generateSlug(title) {
     .replace(/[^a-z0-9 -]/g, '') // Remove special characters
     .replace(/\s+/g, '-') // Replace spaces with hyphens
     .replace(/-+/g, '-') // Replace multiple hyphens with single
-    .trim('-'); // Remove leading/trailing hyphens
+    .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
 }
 
 // Export functions for use in other files
