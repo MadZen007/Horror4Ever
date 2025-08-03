@@ -134,6 +134,7 @@ async function handleGetProfile(req, res) {
         profileData = typeof member.profile_data === 'string' ? 
           JSON.parse(member.profile_data) : member.profile_data;
       } catch (e) {
+        console.log('Error parsing profile_data:', e.message);
         profileData = {};
       }
     }
@@ -163,6 +164,12 @@ async function handleUpdateProfile(req, res) {
     // Decode member token to get member ID
     const decoded = Buffer.from(memberToken, 'base64').toString('utf-8');
     const memberId = decoded.split(':')[0];
+
+    // First, check if the member exists
+    const memberCheck = await pool.query('SELECT id FROM members WHERE id = $1', [memberId]);
+    if (memberCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Member not found' });
+    }
 
     // Prepare profile data
     const profileData = {

@@ -109,30 +109,50 @@ async function handleGetStats(req, res) {
     const decoded = Buffer.from(memberToken, 'base64').toString('utf-8');
     const memberId = decoded.split(':')[0];
 
-    // Get member's game statistics
-    const statsQuery = `
-      SELECT 
-        COALESCE(SUM(gs.final_score), 0) as total_score,
-        COUNT(DISTINCT gs.id) as games_played,
-        COUNT(qr.id) as questions_answered,
-        COUNT(CASE WHEN qr.is_correct = true THEN 1 END) as correct_answers,
-        COALESCE(AVG(gs.final_score), 0) as avg_score
-      FROM members m
-      LEFT JOIN game_sessions gs ON m.id = gs.member_id
-      LEFT JOIN question_responses qr ON gs.id = qr.session_id
-      WHERE m.id = $1
-    `;
+    // First, check if the member exists
+    const memberCheck = await pool.query('SELECT id FROM members WHERE id = $1', [memberId]);
+    if (memberCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Member not found' });
+    }
 
-    const statsResult = await pool.query(statsQuery, [memberId]);
-    const stats = statsResult.rows[0];
+    // Check if tracking tables exist before querying them
+    try {
+      // Get member's game statistics with safe fallbacks
+      const statsQuery = `
+        SELECT 
+          COALESCE(SUM(gs.final_score), 0) as total_score,
+          COUNT(DISTINCT gs.id) as games_played,
+          COALESCE(COUNT(qr.id), 0) as questions_answered,
+          COALESCE(COUNT(CASE WHEN qr.is_correct = true THEN 1 END), 0) as correct_answers,
+          COALESCE(AVG(gs.final_score), 0) as avg_score
+        FROM members m
+        LEFT JOIN game_sessions gs ON m.id = gs.member_id
+        LEFT JOIN question_responses qr ON gs.id = qr.session_id
+        WHERE m.id = $1
+      `;
 
-    res.status(200).json({
-      totalScore: parseInt(stats.total_score) || 0,
-      gamesPlayed: parseInt(stats.games_played) || 0,
-      questionsAnswered: parseInt(stats.questions_answered) || 0,
-      correctAnswers: parseInt(stats.correct_answers) || 0,
-      avgScore: parseFloat(stats.avg_score) || 0
-    });
+      const statsResult = await pool.query(statsQuery, [memberId]);
+      const stats = statsResult.rows[0];
+
+      res.status(200).json({
+        totalScore: parseInt(stats.total_score) || 0,
+        gamesPlayed: parseInt(stats.games_played) || 0,
+        questionsAnswered: parseInt(stats.questions_answered) || 0,
+        correctAnswers: parseInt(stats.correct_answers) || 0,
+        avgScore: parseFloat(stats.avg_score) || 0
+      });
+
+    } catch (tableError) {
+      // If tracking tables don't exist yet, return zero stats
+      console.log('Tracking tables not found, returning zero stats:', tableError.message);
+      res.status(200).json({
+        totalScore: 0,
+        gamesPlayed: 0,
+        questionsAnswered: 0,
+        correctAnswers: 0,
+        avgScore: 0
+      });
+    }
 
   } catch (error) {
     console.error('Error fetching member stats:', error);
