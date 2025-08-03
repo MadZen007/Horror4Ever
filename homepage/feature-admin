@@ -298,6 +298,20 @@
         
         .edit-modal input,
         .edit-modal textarea,
+        
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+            font-style: italic;
+        }
         .edit-modal select {
             width: 100%;
             padding: 8px;
@@ -517,6 +531,28 @@
                 </div>
             </div>
         </div>
+
+        <!-- Articles Management -->
+        <div class="questions-section">
+            <h2 class="section-title">📰 Article Management</h2>
+            
+            <div class="questions-tabs">
+                <button class="tab-button active" onclick="showArticlesTab('published')">✅ Published Articles</button>
+                <button class="tab-button" onclick="showArticlesTab('draft')">📝 Draft Articles</button>
+            </div>
+
+            <div id="published-tab" class="tab-content">
+                <div class="questions-list" id="published-articles">
+                    <div class="loading">Loading published articles...</div>
+                </div>
+            </div>
+
+            <div id="draft-tab" class="tab-content" style="display: none;">
+                <div class="questions-list" id="draft-articles">
+                    <div class="loading">Loading draft articles...</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -529,6 +565,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadStats();
             loadQuestions();
+            loadArticles();
         });
 
         // Load dashboard statistics
@@ -1027,6 +1064,259 @@
             }, 5000);
         }
         
+        // Articles Management Functions
+        let currentArticlesTab = 'published';
+        let publishedArticles = [];
+        let draftArticles = [];
+
+
+
+        // Load articles from API
+        async function loadArticles() {
+            try {
+                const response = await fetch('/api/articles');
+                if (!response.ok) throw new Error('Failed to load articles');
+                
+                const articles = await response.json();
+                
+                // Separate published and draft articles
+                publishedArticles = articles.filter(article => article.is_published);
+                draftArticles = articles.filter(article => !article.is_published);
+                
+                displayArticles('published', publishedArticles);
+                displayArticles('draft', draftArticles);
+                
+            } catch (error) {
+                console.error('Error loading articles:', error);
+                showMessage('Failed to load articles', 'error');
+            }
+        }
+
+        // Display articles in the appropriate tab
+        function displayArticles(tab, articles) {
+            const container = document.getElementById(`${tab}-articles`);
+            
+            if (articles.length === 0) {
+                container.innerHTML = '<div class="empty-state">No articles found</div>';
+                return;
+            }
+            
+            container.innerHTML = articles.map(article => `
+                <div class="question-item">
+                    <div class="question-header">
+                        <div class="question-text">
+                            <strong>${article.title}</strong><br>
+                            <small>By ${article.author} • ${new Date(article.date).toLocaleDateString()}</small>
+                        </div>
+                        <div class="question-actions">
+                            <button class="view-btn" onclick="viewArticleDetails('${article.id}')">👁️ View</button>
+                            <button class="view-btn" onclick="editArticle('${article.id}')">✏️ Edit</button>
+                            <button class="view-btn" onclick="deleteArticle('${article.id}')" style="background: #ff4444;">🗑️ Delete</button>
+                            ${!article.is_published ? `<button class="view-btn" onclick="publishArticle('${article.id}')" style="background: #44ff44;">✅ Publish</button>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Show articles tab
+        function showArticlesTab(tab) {
+            currentArticlesTab = tab;
+            
+            // Update tab buttons
+            document.querySelectorAll('.questions-section:last-child .tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show/hide tab content
+            document.getElementById('published-tab').style.display = tab === 'published' ? 'block' : 'none';
+            document.getElementById('draft-tab').style.display = tab === 'draft' ? 'block' : 'none';
+        }
+
+        // View article details
+        async function viewArticleDetails(articleId) {
+            try {
+                const response = await fetch(`/api/articles?id=${articleId}`);
+                if (!response.ok) throw new Error('Failed to load article');
+                
+                const article = await response.json();
+                
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Article Details</h3>
+                            <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <h4>${article.title}</h4>
+                            <p><strong>Author:</strong> ${article.author}</p>
+                            <p><strong>Date:</strong> ${new Date(article.date).toLocaleDateString()}</p>
+                            <p><strong>Slug:</strong> ${article.slug}</p>
+                            <p><strong>Status:</strong> ${article.is_published ? 'Published' : 'Draft'}</p>
+                            <p><strong>Summary:</strong> ${article.summary || 'No summary'}</p>
+                            <p><strong>Tags:</strong> ${article.tags ? article.tags.join(', ') : 'No tags'}</p>
+                            <hr>
+                            <h5>Content:</h5>
+                            <div style="max-height: 300px; overflow-y: auto; background: #1a1a1a; padding: 15px; border-radius: 5px;">
+                                ${article.content}
+                            </div>
+                            ${article.thumbnail ? `<hr><h5>Thumbnail:</h5><img src="${article.thumbnail}" style="max-width: 200px; border-radius: 5px;">` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+                
+            } catch (error) {
+                console.error('Error loading article details:', error);
+                showMessage('Failed to load article details', 'error');
+            }
+        }
+
+        // Edit article
+        async function editArticle(articleId) {
+            try {
+                const response = await fetch(`/api/articles?id=${articleId}`);
+                if (!response.ok) throw new Error('Failed to load article');
+                
+                const article = await response.json();
+                
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal-content edit-modal">
+                        <div class="modal-header">
+                            <h3>Edit Article</h3>
+                            <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editArticleForm">
+                                <div class="form-group">
+                                    <label>Title *</label>
+                                    <input type="text" id="editTitle" value="${article.title}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Slug *</label>
+                                    <input type="text" id="editSlug" value="${article.slug}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Author *</label>
+                                    <input type="text" id="editAuthor" value="${article.author}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Date</label>
+                                    <input type="date" id="editDate" value="${article.date}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Summary</label>
+                                    <textarea id="editSummary">${article.summary || ''}</textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>Content *</label>
+                                    <textarea id="editContent" required style="min-height: 200px;">${article.content}</textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>Tags (comma-separated)</label>
+                                    <input type="text" id="editTags" value="${article.tags ? article.tags.join(', ') : ''}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Published</label>
+                                    <input type="checkbox" id="editPublished" ${article.is_published ? 'checked' : ''}>
+                                </div>
+                                <div class="form-buttons">
+                                    <button type="submit" class="admin-button">Save Changes</button>
+                                    <button type="button" class="admin-button secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+                
+                // Handle form submission
+                document.getElementById('editArticleForm').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const updateData = {
+                        title: document.getElementById('editTitle').value,
+                        slug: document.getElementById('editSlug').value,
+                        author: document.getElementById('editAuthor').value,
+                        date: document.getElementById('editDate').value,
+                        summary: document.getElementById('editSummary').value,
+                        content: document.getElementById('editContent').value,
+                        tags: document.getElementById('editTags').value.split(',').map(tag => tag.trim()).filter(tag => tag),
+                        is_published: document.getElementById('editPublished').checked
+                    };
+                    
+                    try {
+                        const updateResponse = await fetch(`/api/articles?id=${articleId}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(updateData)
+                        });
+                        
+                        if (!updateResponse.ok) throw new Error('Failed to update article');
+                        
+                        showMessage('Article updated successfully!', 'success');
+                        modal.remove();
+                        loadArticles();
+                        
+                    } catch (error) {
+                        console.error('Error updating article:', error);
+                        showMessage('Failed to update article', 'error');
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error loading article for edit:', error);
+                showMessage('Failed to load article details', 'error');
+            }
+        }
+
+        // Delete article
+        async function deleteArticle(articleId) {
+            if (!confirm('Are you sure you want to delete this article? This action cannot be undone.')) return;
+            
+            try {
+                const response = await fetch(`/api/articles?id=${articleId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) throw new Error('Failed to delete article');
+                
+                showMessage('Article deleted successfully!', 'success');
+                loadArticles();
+                
+            } catch (error) {
+                console.error('Error deleting article:', error);
+                showMessage('Failed to delete article', 'error');
+            }
+        }
+
+        // Publish article
+        async function publishArticle(articleId) {
+            try {
+                const response = await fetch(`/api/articles?id=${articleId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ is_published: true })
+                });
+                
+                if (!response.ok) throw new Error('Failed to publish article');
+                
+                showMessage('Article published successfully!', 'success');
+                loadArticles();
+                
+            } catch (error) {
+                console.error('Error publishing article:', error);
+                showMessage('Failed to publish article', 'error');
+            }
+        }
+
         // Track admin dashboard visit
         window.addEventListener('load', async () => {
             try {
