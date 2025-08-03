@@ -286,7 +286,7 @@
         </div>
 
         <div class="form-buttons">
-          <button type="submit" class="submit-button" id="submitButton">PUBLISH ARTICLE</button>
+          <button type="submit" class="submit-button" id="submitButton" onclick="console.log('Submit button clicked!')">PUBLISH ARTICLE</button>
           <a href="index.html" class="cancel-button">CANCEL</a>
         </div>
       </form>
@@ -368,10 +368,14 @@
     
     // Handle form submission
     document.getElementById('articleForm').addEventListener('submit', async function(e) {
+      console.log('Form submission triggered!');
       e.preventDefault();
       
       const submitButton = document.getElementById('submitButton');
       const messageDiv = document.getElementById('message');
+      
+      console.log('Submit button:', submitButton);
+      console.log('Message div:', messageDiv);
       
       // Disable submit button
       submitButton.disabled = true;
@@ -407,6 +411,8 @@
           tags: tags
         };
         
+        console.log('Submitting article data:', articleData);
+        
         // Submit to API
         const response = await fetch('/api/articles', {
           method: 'POST',
@@ -414,7 +420,9 @@
           body: JSON.stringify(articleData)
         });
         
+        console.log('API response status:', response.status);
         const result = await response.json();
+        console.log('API response:', result);
         
         if (response.ok) {
           messageDiv.className = 'message success';
