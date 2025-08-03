@@ -1,6 +1,5 @@
 // API endpoint for movies CRUD operations
 import { Pool } from 'pg';
-import fetch from 'node-fetch';
 
 const pool = new Pool({
   connectionString: process.env.COCKROACHDB_CONNECTION_STRING,
