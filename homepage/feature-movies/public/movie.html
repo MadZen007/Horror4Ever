@@ -145,6 +145,9 @@
         // Update page title
         document.title = `${movie.title} (${movie.year}) - Horror4Ever`;
         
+        // Track the view
+        await trackMovieView(movieId);
+        
         // Create movie HTML
         const videoEmbed = movie.youtube_id 
           ? MoviesModule.generateYouTubeEmbed(movie.youtube_id)
@@ -181,6 +184,22 @@
       document.getElementById('loadingState').style.display = 'none';
       document.getElementById('errorState').style.display = 'block';
       document.getElementById('errorMessage').textContent = message;
+    }
+    
+    // Track movie view
+    async function trackMovieView(movieId) {
+      try {
+        await fetch('/api/movies/track-view', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ movieId })
+        });
+      } catch (error) {
+        console.error('Error tracking movie view:', error);
+        // Don't show error to user, just log it
+      }
     }
   </script>
 </body>

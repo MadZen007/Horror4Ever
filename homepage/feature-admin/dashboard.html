@@ -612,6 +612,7 @@
                 <div class="button-grid">
                     <button class="admin-button" onclick="showAddMovieModal()">🎬 Add Movie</button>
                     <a href="../feature-movies/public/index.html" class="admin-button">🎬 View Movies</a>
+                    <button class="admin-button secondary" onclick="addViewsColumn()">📊 Add Views Column</button>
                 </div>
             </div>
 
@@ -1461,6 +1462,7 @@
                     </div>
                     <div class="question-details">
                         <strong>YouTube ID:</strong> ${movie.youtube_id}<br>
+                        <strong>Views:</strong> ${movie.views || 0} 👀<br>
                         <strong>Description:</strong> ${movie.description || 'No description'}
                     </div>
                 </div>
@@ -1552,6 +1554,9 @@
                             </div>
                             <div class="detail-group">
                                 <strong>YouTube ID:</strong> ${movie.youtube_id}
+                            </div>
+                            <div class="detail-group">
+                                <strong>Views:</strong> ${movie.views || 0} 👀
                             </div>
                             <div class="detail-group">
                                 <strong>Description:</strong> ${movie.description || 'No description'}
@@ -1663,6 +1668,28 @@
             } catch (error) {
                 console.error('Error deleting movie:', error);
                 showMessage('Failed to delete movie', 'error');
+            }
+        }
+
+        // Add views column to movies table
+        async function addViewsColumn() {
+            try {
+                const response = await fetch('/api/dev-tools/setup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ action: 'add-views-column' })
+                });
+                
+                if (!response.ok) throw new Error('Failed to add views column');
+                
+                const result = await response.json();
+                showMessage(result.message || 'Views column added successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error adding views column:', error);
+                showMessage('Failed to add views column', 'error');
             }
         }
     </script>

@@ -40,10 +40,13 @@ export default async function handler(req, res) {
       case 'import-questions':
         await importQuestions(req, res);
         break;
+      case 'add-views-column':
+        await addViewsColumn(res);
+        break;
       default:
         res.status(400).json({ 
           error: 'Invalid action',
-          details: 'Valid actions: setup-movies, setup-articles, setup-members, update-schema, import-questions'
+          details: 'Valid actions: setup-movies, setup-articles, setup-members, update-schema, import-questions, add-views-column'
         });
     }
     
@@ -67,6 +70,7 @@ async function setupMovies(res) {
         year INTEGER NOT NULL,
         youtube_id VARCHAR(20) NOT NULL,
         description TEXT,
+        views INTEGER DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
@@ -252,6 +256,30 @@ async function importQuestions(req, res) {
       success: false,
       error: 'Failed to import questions',
       details: error.message
+    });
+  }
+}
+
+// Add views column to movies table
+async function addViewsColumn(res) {
+  try {
+    // Add views column if it doesn't exist
+    await pool.query(`
+      ALTER TABLE movies 
+      ADD COLUMN IF NOT EXISTS views INTEGER DEFAULT 0
+    `);
+    
+    res.status(200).json({ 
+      success: true, 
+      message: 'Views column added successfully!' 
+    });
+    
+  } catch (error) {
+    console.error('Error adding views column:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to add views column',
+      details: error.message 
     });
   }
 } 

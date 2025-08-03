@@ -55,7 +55,7 @@ async function handleGet(req, res) {
     } else {
       // Get all movies
       const result = await pool.query(
-        'SELECT * FROM movies ORDER BY year DESC, created_at DESC'
+        'SELECT * FROM movies ORDER BY views DESC, year DESC, created_at DESC'
       );
       res.status(200).json(result.rows);
     }
