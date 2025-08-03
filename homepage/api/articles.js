@@ -53,11 +53,8 @@ async function handleGet(req, res) {
       
       res.status(200).json(result.rows[0]);
     } else {
-      // Get all articles (published only by default)
-      const publishedOnly = published !== 'false';
-      const query = publishedOnly 
-        ? 'SELECT * FROM articles WHERE is_published = true ORDER BY date DESC, created_at DESC'
-        : 'SELECT * FROM articles ORDER BY date DESC, created_at DESC';
+      // Get all articles (show both published and unpublished for now)
+      const query = 'SELECT * FROM articles ORDER BY date DESC, created_at DESC';
       
       const result = await pool.query(query);
       res.status(200).json(result.rows);
