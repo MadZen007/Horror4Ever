@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Review - Horror4Ever</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .movie-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .movie-header {
+      margin-bottom: 30px;
+    }
+    
+    .movie-title {
+      font-size: 2.5rem;
+      color: var(--accent-orange);
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+    }
+    
+    .movie-meta {
+      display: flex;
+      gap: 20px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+    
+    .video-container {
+      position: relative;
+      width: 100%;
+      height: 0;
+      padding-bottom: 56.25%; /* 16:9 aspect ratio */
+      margin-bottom: 30px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 3px solid var(--accent-orange);
+    }
+    
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    
+    .movie-description {
+      line-height: 1.8;
+      font-size: 1.1rem;
+      color: var(--text-light);
+    }
+    
+    .loading-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    
+    .loading-spinner {
+      border: 4px solid var(--border-color);
+      border-top: 4px solid var(--accent-orange);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .error-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--accent-red);
+    }
+  </style>
+</head>
+<body>
+  <div class="movies-container">
+    <!-- Header -->
+    <header class="movies-header">
+      <a href="index.html" class="back-button">← Back to Movies</a>
+      <div class="header-content">
+        <h1 class="movies-title">🎬 HORROR MOVIES 🎬</h1>
+        <p class="movies-subtitle">Discover the best horror films and hidden gems</p>
+      </div>
+    </header>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Loading movie...</p>
+    </div>
+
+    <!-- Movie Content -->
+    <div id="movieContent" class="movie-container" style="display: none;">
+      <!-- Movie will be loaded here -->
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="error-state" style="display: none;">
+      <h2>Movie Not Found</h2>
+      <p id="errorMessage">The movie you're looking for doesn't exist.</p>
+      <a href="index.html" class="submit-button">Back to Movies</a>
+    </div>
+  </div>
+
+  <script src="../src/movies.js"></script>
+  <script>
+    // Get movie ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const movieId = urlParams.get('id');
+    
+    if (!movieId) {
+      showError('No movie specified');
+    } else {
+      loadMovie(movieId);
+    }
+    
+    async function loadMovie(movieId) {
+      const loadingState = document.getElementById('loadingState');
+      const movieContent = document.getElementById('movieContent');
+      const errorState = document.getElementById('errorState');
+      
+      try {
+        const movie = await MoviesModule.loadMovie(movieId);
+        
+        if (!movie) {
+          throw new Error('Movie not found');
+        }
+        
+        // Hide loading, show content
+        loadingState.style.display = 'none';
+        movieContent.style.display = 'block';
+        
+        // Update page title
+        document.title = `${movie.title} (${movie.year}) - Horror4Ever`;
+        
+        // Create movie HTML
+        const videoEmbed = movie.youtube_id 
+          ? MoviesModule.generateYouTubeEmbed(movie.youtube_id)
+          : '';
+        
+        movieContent.innerHTML = `
+          <div class="movie-header">
+            <h1 class="movie-title">${movie.title}</h1>
+            <div class="movie-meta">
+              <span>${movie.year}</span>
+              ${movie.description ? `<span>${movie.description}</span>` : ''}
+            </div>
+          </div>
+          
+          ${videoEmbed ? `
+            <div class="video-container">
+              <iframe src="${videoEmbed}" 
+                      title="${movie.title} Review" 
+                      frameborder="0" 
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                      allowfullscreen>
+              </iframe>
+            </div>
+          ` : '<p class="movie-description">Video not available.</p>'}
+        `;
+        
+      } catch (error) {
+        console.error('Error loading movie:', error);
+        showError('Failed to load movie. Please try again.');
+      }
+    }
+    
+    function showError(message) {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('errorState').style.display = 'block';
+      document.getElementById('errorMessage').textContent = message;
+    }
+  </script>
+</body>
+</html> 

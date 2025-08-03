@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Horror Movies - Horror4Ever</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="movies-container">
+    <!-- Header -->
+    <header class="movies-header">
+      <a href="../../index.html" class="back-button">← Back to Home</a>
+      <div class="header-content">
+        <h1 class="movies-title">🎬 HORROR MOVIES 🎬</h1>
+        <p class="movies-subtitle">Discover the best horror films and hidden gems</p>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <div class="hero-section">
+      <img src="../../images/Movies-landing-image.png" alt="Horror Movies" class="hero-image">
+      <div class="hero-text">
+        <p>We ALLLLLL know the agony of trying to find that new movie we've never seen before! Here we'll do our best to give you reviews of ones we love, and hopefully you'll find a hidden gem to enjoy tonight!</p>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Loading movies...</p>
+    </div>
+
+    <!-- Movies Grid -->
+    <div id="moviesGrid" class="movies-grid" style="display: none;">
+      <!-- Movies will be populated here -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="empty-state" style="display: none;">
+      <div class="empty-content">
+        <h2>No Movies Yet</h2>
+        <p>Be the first to add a horror movie review!</p>
+        <a href="submit.html" class="submit-button">Submit First Movie</a>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="error-state" style="display: none;">
+      <div class="error-content">
+        <h2>Error Loading Movies</h2>
+        <p id="errorMessage">Something went wrong. Please try again.</p>
+        <button onclick="loadMovies()" class="retry-button">Retry</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../src/movies.js"></script>
+  <script>
+    // Load movies on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadMovies();
+    });
+  </script>
+</body>
+</html> 
