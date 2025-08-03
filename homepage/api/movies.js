@@ -1,5 +1,6 @@
 // API endpoint for movies CRUD operations
 import { Pool } from 'pg';
+import fetch from 'node-fetch';
 
 const pool = new Pool({
   connectionString: process.env.COCKROACHDB_CONNECTION_STRING,
@@ -68,13 +69,13 @@ async function handleGet(req, res) {
 // POST - Create new movie
 async function handleCreate(req, res) {
   try {
-    const { title, year, youtube_url, description } = req.body;
+    const { youtube_url, description } = req.body;
     
     // Validate required fields
-    if (!title || !year || !youtube_url) {
+    if (!youtube_url) {
       return res.status(400).json({
         error: 'Missing required fields',
-        details: 'Title, year, and YouTube URL are required'
+        details: 'YouTube URL is required'
       });
     }
     
@@ -87,16 +88,27 @@ async function handleCreate(req, res) {
       });
     }
     
+    // Fetch video details from YouTube
+    const videoDetails = await fetchYouTubeVideoDetails(youtubeId);
+    if (!videoDetails) {
+      return res.status(400).json({
+        error: 'Failed to fetch video details',
+        details: 'Could not retrieve video information from YouTube'
+      });
+    }
+    
+    const { title, year } = videoDetails;
+    
     // Check if movie already exists
     const existingMovie = await pool.query(
-      'SELECT id FROM movies WHERE title = $1 AND year = $2',
-      [title, year]
+      'SELECT id FROM movies WHERE youtube_id = $1',
+      [youtubeId]
     );
     
     if (existingMovie.rows.length > 0) {
       return res.status(400).json({
         error: 'Movie already exists',
-        details: 'A movie with this title and year already exists'
+        details: 'A movie with this YouTube video already exists'
       });
     }
     
@@ -128,7 +140,7 @@ async function handleCreate(req, res) {
 async function handleUpdate(req, res) {
   try {
     const { id } = req.query;
-    const { title, year, youtube_url, description } = req.body;
+    const { youtube_url, description } = req.body;
     
     if (!id) {
       return res.status(400).json({ error: 'Movie ID required' });
@@ -140,8 +152,11 @@ async function handleUpdate(req, res) {
       return res.status(404).json({ error: 'Movie not found' });
     }
     
-    // Extract YouTube video ID if URL provided
+    let title = null;
+    let year = null;
     let youtubeId = null;
+    
+    // Extract YouTube video ID and fetch details if URL provided
     if (youtube_url) {
       youtubeId = extractYouTubeId(youtube_url);
       if (!youtubeId) {
@@ -150,6 +165,18 @@ async function handleUpdate(req, res) {
           details: 'Please provide a valid YouTube video URL'
         });
       }
+      
+      // Fetch video details from YouTube
+      const videoDetails = await fetchYouTubeVideoDetails(youtubeId);
+      if (!videoDetails) {
+        return res.status(400).json({
+          error: 'Failed to fetch video details',
+          details: 'Could not retrieve video information from YouTube'
+        });
+      }
+      
+      title = videoDetails.title;
+      year = videoDetails.year;
     }
     
     // Update movie
@@ -219,4 +246,38 @@ function extractYouTubeId(url) {
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
   const match = url.match(regExp);
   return (match && match[2].length === 11) ? match[2] : null;
+}
+
+// Fetch video details from YouTube
+async function fetchYouTubeVideoDetails(videoId) {
+  try {
+    // Use YouTube's oEmbed API to get video details
+    const response = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
+    
+    if (!response.ok) {
+      console.error('YouTube oEmbed API error:', response.status);
+      return null;
+    }
+    
+    const data = await response.json();
+    
+    // Extract title from the response
+    const title = data.title;
+    
+    // Try to extract year from title (common pattern: "Movie Name (2023)")
+    let year = null;
+    const yearMatch = title.match(/\((\d{4})\)/);
+    if (yearMatch) {
+      year = parseInt(yearMatch[1]);
+    } else {
+      // If no year in title, use current year as fallback
+      year = new Date().getFullYear();
+    }
+    
+    return { title, year };
+    
+  } catch (error) {
+    console.error('Error fetching YouTube video details:', error);
+    return null;
+  }
 } 

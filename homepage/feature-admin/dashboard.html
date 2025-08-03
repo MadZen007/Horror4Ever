@@ -1479,17 +1479,9 @@
                     </div>
                     <form id="addMovieForm" class="modal-form">
                         <div class="form-group">
-                            <label for="movieTitle">Title *</label>
-                            <input type="text" id="movieTitle" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="movieYear">Year *</label>
-                            <input type="number" id="movieYear" min="1900" max="2030" required>
-                        </div>
-                        <div class="form-group">
                             <label for="movieYoutubeUrl">YouTube URL *</label>
                             <input type="url" id="movieYoutubeUrl" placeholder="https://www.youtube.com/watch?v=..." required>
-                            <small>Paste the full YouTube URL - the video ID will be extracted automatically</small>
+                            <small>Paste the full YouTube URL - the title and year will be extracted automatically</small>
                         </div>
                         <div class="form-group">
                             <label for="movieDescription">Description</label>
@@ -1510,8 +1502,6 @@
                 e.preventDefault();
                 
                 const movieData = {
-                    title: document.getElementById('movieTitle').value,
-                    year: parseInt(document.getElementById('movieYear').value),
                     youtube_url: document.getElementById('movieYoutubeUrl').value,
                     description: document.getElementById('movieDescription').value || null
                 };
@@ -1602,17 +1592,9 @@
                         </div>
                         <form id="editMovieForm" class="modal-form">
                             <div class="form-group">
-                                <label for="editMovieTitle">Title *</label>
-                                <input type="text" id="editMovieTitle" value="${movie.title}" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="editMovieYear">Year *</label>
-                                <input type="number" id="editMovieYear" value="${movie.year}" min="1900" max="2030" required>
-                            </div>
-                            <div class="form-group">
                                 <label for="editMovieYoutubeUrl">YouTube URL *</label>
                                 <input type="url" id="editMovieYoutubeUrl" value="https://www.youtube.com/watch?v=${movie.youtube_id}" required>
-                                <small>Paste the full YouTube URL - the video ID will be extracted automatically</small>
+                                <small>Paste the full YouTube URL - the title and year will be extracted automatically</small>
                             </div>
                             <div class="form-group">
                                 <label for="editMovieDescription">Description</label>
@@ -1633,8 +1615,6 @@
                     e.preventDefault();
                     
                     const updateData = {
-                        title: document.getElementById('editMovieTitle').value,
-                        year: parseInt(document.getElementById('editMovieYear').value),
                         youtube_url: document.getElementById('editMovieYoutubeUrl').value,
                         description: document.getElementById('editMovieDescription').value || null
                     };
