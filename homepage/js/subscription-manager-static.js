@@ -127,10 +127,10 @@ class StaticSubscriptionManager {
               <li>Help keep a real person fed! 🍕 (This site is built and run by just one horror-loving human)</li>
             </ul>
             <div style="margin: 2rem 0;">
-              <a href="https://ko-fi.com/ihearthorror" target="_blank" rel="noopener noreferrer" 
-                 style="display: inline-block; background: #FF7518; color: #000; padding: 1rem 2rem; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem;">
-                🍕 Support on Ko-fi - $2/month
-              </a>
+                          <a href="https://ko-fi.com/ihearthorror" target="_blank" rel="noopener noreferrer" 
+               style="display: inline-block; background: #FF7518; color: #000; padding: 1rem 2rem; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem;">
+              🍕 Support on Ko-fi - $5/month
+            </a>
             </div>
             <p style="font-size: 0.9rem; color: #B0B0B0; margin-top: 1rem;">
               After supporting on Ko-fi, click the button below to activate your subscription:
@@ -230,7 +230,7 @@ class StaticSubscriptionManager {
     prompt.innerHTML = `
       <h3 style="color: #FF7518; margin-bottom: 1rem;">🎃 Remove Ads! 🎃</h3>
       <p style="color: #E0E0E0; margin-bottom: 1rem;">
-        Support us on Ko-fi for just $2/month and enjoy an ad-free experience!
+        Support us on Ko-fi for just $5/month and enjoy an ad-free experience!
       </p>
       <p style="color: #B0B0B0; font-size: 0.9rem; margin-bottom: 1.5rem; font-style: italic;">
         Plus, you'll help keep this horror-loving human fed! 🍕 (This site is built and run by just one person)

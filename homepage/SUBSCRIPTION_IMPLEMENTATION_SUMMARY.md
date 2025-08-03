@@ -6,7 +6,7 @@ This implementation adds a subscription system and Google AdSense integration to
 ## What's Been Implemented
 
 ### 1. Subscription System
-- **$2/month subscription** with premium benefits
+- **$5/month subscription** with premium benefits
 - **Free membership** for basic features (suggestions only)
 - **Subscription management** (create, cancel, reactivate)
 - **User authentication** integration with existing member system
@@ -56,7 +56,7 @@ homepage/
 3. **See ads** in designated containers (top, bottom, in-content)
 4. **Get prompted** to subscribe for ad-free experience
 
-### For Subscribers ($2/month):
+### For Subscribers ($5/month):
 1. **No ads** - Clean, ad-free experience
 2. **Early access** to new games and features
 3. **Make suggestions** for new content
@@ -115,13 +115,13 @@ The system is ready to use with simulated payments. Users can:
 - **Ads**: Yes (Google AdSense)
 - **Features**: Limited suggestions
 
-### Paid Tier ($2/month):
+### Paid Tier ($5/month):
 - **Access**: All content + early access
 - **Ads**: No (ad-free experience)
 - **Features**: Full suggestions + personalized profiles
 
 ### Revenue Streams:
-1. **Subscription revenue**: $2/month per subscriber
+1. **Subscription revenue**: $5/month per subscriber
 2. **Ad revenue**: Google AdSense for non-subscribers
 3. **Existing**: Ko-fi donations
 
@@ -131,7 +131,7 @@ The system is ready to use with simulated payments. Users can:
 1. Visit site → See ads
 2. Explore content → Get subscription prompts
 3. Sign up for free membership → Can make suggestions
-4. Subscribe for $2/month → Remove ads, get premium features
+4. Subscribe for $5/month → Remove ads, get premium features
 
 ### Existing Member:
 1. Log in → See subscription status

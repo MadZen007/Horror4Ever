@@ -52,7 +52,7 @@ router.post('/create', checkSubscription, async (req, res) => {
     // Create Stripe subscription
     const subscription = await stripe.subscriptions.create({
       customer: customer.id,
-      items: [{ price: process.env.STRIPE_PRICE_ID }], // Your $2/month price ID
+      items: [{ price: process.env.STRIPE_PRICE_ID }], // Your $5/month price ID
       payment_behavior: 'default_incomplete',
       payment_settings: { save_default_payment_method: 'on_subscription' },
       expand: ['latest_invoice.payment_intent'],
@@ -148,7 +148,7 @@ async function subscribe() {
     console.error('Subscription error:', error);
     showError(error.message);
     document.getElementById('subscribeButton').disabled = false;
-    document.getElementById('subscribeButton').textContent = 'Subscribe Now - $2/month';
+    document.getElementById('subscribeButton').textContent = 'Subscribe Now - $5/month';
   }
 }
 ```
@@ -184,7 +184,7 @@ router.post('/create', checkSubscription, async (req, res) => {
     // Create PayPal subscription
     const request = new paypal.subscriptions.SubscriptionsPostRequest();
     request.requestBody({
-      plan_id: process.env.PAYPAL_PLAN_ID, // Your $2/month plan ID
+      plan_id: process.env.PAYPAL_PLAN_ID, // Your $5/month plan ID
       subscriber: {
         name: {
           given_name: req.user.name
