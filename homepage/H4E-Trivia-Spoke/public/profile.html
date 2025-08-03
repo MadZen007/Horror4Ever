@@ -472,6 +472,8 @@
           showMessage('Profile updated successfully!', 'success');
           // Update localStorage with new username
           localStorage.setItem('horror4ever_member_name', formData.get('username'));
+          // Also show alert as immediate feedback
+          alert('✅ Profile updated successfully!');
         } else {
           const errorData = await response.json();
           console.error('Profile update failed:', errorData);
@@ -485,15 +487,47 @@
 
     // Show message
     function showMessage(message, type) {
+      console.log('showMessage called:', message, type);
+      
       const messageDiv = document.createElement('div');
       messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
       messageDiv.textContent = message;
+      messageDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 8px;
+        color: white;
+        font-weight: bold;
+        z-index: 10000;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        animation: slideIn 0.3s ease-out;
+        ${type === 'success' ? 
+          'background: linear-gradient(135deg, #44FF44, #22AA22); border: 2px solid #00FF00;' : 
+          'background: linear-gradient(135deg, #FF4444, #AA2222); border: 2px solid #FF0000;'
+        }
+      `;
       
-      const container = document.querySelector('.profile-container');
-      container.insertBefore(messageDiv, container.firstChild);
+      // Add CSS animation
+      if (!document.getElementById('message-styles')) {
+        const style = document.createElement('style');
+        style.id = 'message-styles';
+        style.textContent = `
+          @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+      
+      document.body.appendChild(messageDiv);
       
       setTimeout(() => {
-        messageDiv.remove();
+        if (messageDiv.parentNode) {
+          messageDiv.remove();
+        }
       }, 5000);
     }
 
