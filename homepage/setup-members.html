@@ -76,7 +76,7 @@
             resultDiv.textContent = 'Setting up members table...';
             
             try {
-                const response = await fetch('/api/trivia/setup-members', {
+                const response = await fetch('/api/dev-tools/setup-members', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' }
                 });
@@ -103,7 +103,7 @@
             resultDiv.textContent = 'Updating schema...';
             
             try {
-                const response = await fetch('/api/trivia/update-schema', {
+                const response = await fetch('/api/dev-tools/update-schema', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' }
                 });

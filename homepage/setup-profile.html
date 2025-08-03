@@ -106,7 +106,7 @@
             resultDiv.textContent = 'Updating schema...';
             
             try {
-                const response = await fetch('/api/trivia/setup-members', {
+                const response = await fetch('/api/dev-tools/setup-members', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' }
                 });
