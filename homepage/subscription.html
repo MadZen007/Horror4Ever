@@ -349,171 +349,156 @@
         <li>Support the Horror4Ever community</li>
         <li>Help keep a real person fed! 🍕 (This site is built and run by just one horror-loving human)</li>
       </ul>
-      <button id="subscribeButton" class="subscribe-button">Subscribe Now - $2/month</button>
+      <div style="margin: 2rem 0;">
+        <a href="https://ko-fi.com/ihearthorror" target="_blank" rel="noopener noreferrer" 
+           style="display: inline-block; background: #FF7518; color: #000; padding: 1rem 2rem; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem;">
+          🍕 Support on Ko-fi - $2/month
+        </a>
+      </div>
+      <p style="font-size: 0.9rem; color: #B0B0B0; margin-top: 1rem;">
+        After supporting on Ko-fi, click the button below to activate your subscription:
+      </p>
+      <button id="subscribeButton" class="subscribe-button" style="margin-top: 1rem;">Activate Subscription (After Ko-fi Support)</button>
     </div>
   </div>
 
   <script>
-    // Check if user is logged in
-    function checkAuth() {
-      const token = localStorage.getItem('horror4ever_member_token');
-      if (!token) {
-        window.location.href = 'H4E-Trivia-Spoke/public/member-auth.html?redirect=subscription.html';
-        return false;
+    // Static subscription manager for Ko-fi integration
+    class StaticSubscriptionManager {
+      constructor() {
+        this.storageKey = 'horror4ever_subscription';
+        this.init();
       }
-      return true;
-    }
 
-    // Load subscription status
-    async function loadSubscriptionStatus() {
-      try {
-        const token = localStorage.getItem('horror4ever_member_token');
-        const response = await fetch('/api/subscription/status', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
+      init() {
+        this.loadSubscriptionStatus();
+      }
 
-        if (response.ok) {
-          const data = await response.json();
-          displaySubscriptionStatus(data);
-        } else {
-          throw new Error('Failed to load subscription status');
+      // Check if user is subscribed (using localStorage)
+      checkSubscriptionStatus() {
+        const subscription = this.getSubscriptionFromStorage();
+        return subscription && subscription.status === 'active';
+      }
+
+      // Get subscription from localStorage
+      getSubscriptionFromStorage() {
+        try {
+          const stored = localStorage.getItem(this.storageKey);
+          return stored ? JSON.parse(stored) : null;
+        } catch (error) {
+          console.error('Error reading subscription from storage:', error);
+          return null;
         }
-      } catch (error) {
-        console.error('Error loading subscription:', error);
-        showError('Failed to load subscription information. Please try again.');
-      } finally {
+      }
+
+      // Save subscription to localStorage
+      saveSubscriptionToStorage(subscription) {
+        try {
+          localStorage.setItem(this.storageKey, JSON.stringify(subscription));
+        } catch (error) {
+          console.error('Error saving subscription to storage:', error);
+        }
+      }
+
+      // Load subscription status
+      loadSubscriptionStatus() {
+        const subscription = this.getSubscriptionFromStorage();
+        this.displaySubscriptionStatus(subscription);
         document.getElementById('loading').style.display = 'none';
       }
-    }
 
-    // Display subscription status
-    function displaySubscriptionStatus(data) {
-      if (data.isSubscribed) {
-        // Show current subscription
-        document.getElementById('currentSubscription').style.display = 'block';
-        document.getElementById('subscriptionStatus').textContent = 
-          data.subscription.cancelAtPeriodEnd ? 'Cancelling' : 'Active';
-        document.getElementById('subscriptionPlan').textContent = data.plan.name;
-        
-        const nextBilling = new Date(data.subscription.currentPeriodEnd);
-        document.getElementById('nextBilling').textContent = nextBilling.toLocaleDateString();
-        
-        if (data.subscription.cancelAtPeriodEnd) {
+      // Display subscription status
+      displaySubscriptionStatus(subscription) {
+        if (subscription && subscription.status === 'active') {
+          // Show current subscription
+          document.getElementById('currentSubscription').style.display = 'block';
+          document.getElementById('subscriptionStatus').textContent = 'Active';
+          document.getElementById('subscriptionPlan').textContent = 'Horror4Ever Basic';
+          
+          const nextBilling = new Date(subscription.expiresAt);
+          document.getElementById('nextBilling').textContent = nextBilling.toLocaleDateString();
+          
+          document.getElementById('cancelButton').style.display = 'inline-block';
+          document.getElementById('reactivateButton').style.display = 'none';
+        } else if (subscription && subscription.status === 'cancelled') {
+          // Show cancelled subscription
+          document.getElementById('currentSubscription').style.display = 'block';
+          document.getElementById('subscriptionStatus').textContent = 'Cancelled';
+          document.getElementById('subscriptionPlan').textContent = 'Horror4Ever Basic';
+          
+          const nextBilling = new Date(subscription.expiresAt);
+          document.getElementById('nextBilling').textContent = nextBilling.toLocaleDateString();
+          
           document.getElementById('cancelButton').style.display = 'none';
           document.getElementById('reactivateButton').style.display = 'inline-block';
         } else {
-          document.getElementById('cancelButton').style.display = 'inline-block';
-          document.getElementById('reactivateButton').style.display = 'none';
+          // Show subscription card
+          document.getElementById('subscriptionCard').style.display = 'block';
         }
-      } else {
-        // Show subscription card
-        document.getElementById('subscriptionCard').style.display = 'block';
       }
-    }
 
-    // Subscribe
-    async function subscribe() {
-      try {
-        const button = document.getElementById('subscribeButton');
-        button.disabled = true;
-        button.textContent = 'Processing...';
+      // Create a subscription (after Ko-fi support)
+      createSubscription() {
+        const subscription = {
+          id: 'sub_' + Date.now(),
+          status: 'active',
+          plan: 'basic',
+          createdAt: new Date().toISOString(),
+          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days
+        };
+        
+        this.saveSubscriptionToStorage(subscription);
+        alert('🎉 Welcome to Horror4Ever Premium! Your subscription is now active. Thanks for helping keep this horror-loving human fed! 🍕');
+        location.reload();
+        
+        return subscription;
+      }
 
-        const token = localStorage.getItem('horror4ever_member_token');
-        const response = await fetch('/api/subscription/create', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            planId: 'basic'
-          })
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          alert('🎉 Welcome to Horror4Ever Premium! Your subscription is now active. Thanks for helping keep this horror-loving human fed! 🍕');
-          location.reload();
-        } else {
-          throw new Error('Failed to create subscription');
+      // Cancel subscription
+      cancelSubscription() {
+        if (!confirm('Are you sure you want to cancel your subscription? You\'ll continue to have access until the end of your current billing period.')) {
+          return;
         }
-      } catch (error) {
-        console.error('Subscription error:', error);
-        showError('Failed to create subscription. Please try again.');
-        document.getElementById('subscribeButton').disabled = false;
-        document.getElementById('subscribeButton').textContent = 'Subscribe Now - $2/month';
-      }
-    }
 
-    // Cancel subscription
-    async function cancelSubscription() {
-      if (!confirm('Are you sure you want to cancel your subscription? You\'ll continue to have access until the end of your current billing period.')) {
-        return;
-      }
-
-      try {
-        const token = localStorage.getItem('horror4ever_member_token');
-        const response = await fetch('/api/subscription/cancel', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (response.ok) {
+        const subscription = this.getSubscriptionFromStorage();
+        if (subscription) {
+          subscription.status = 'cancelled';
+          subscription.cancelledAt = new Date().toISOString();
+          this.saveSubscriptionToStorage(subscription);
           alert('Your subscription has been cancelled. You\'ll continue to have access until the end of your current billing period.');
           location.reload();
-        } else {
-          throw new Error('Failed to cancel subscription');
         }
-      } catch (error) {
-        console.error('Cancellation error:', error);
-        showError('Failed to cancel subscription. Please try again.');
       }
-    }
 
-    // Reactivate subscription
-    async function reactivateSubscription() {
-      try {
-        const token = localStorage.getItem('horror4ever_member_token');
-        const response = await fetch('/api/subscription/reactivate', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (response.ok) {
+      // Reactivate subscription
+      reactivateSubscription() {
+        const subscription = this.getSubscriptionFromStorage();
+        if (subscription && subscription.status === 'cancelled') {
+          subscription.status = 'active';
+          subscription.reactivatedAt = new Date().toISOString();
+          subscription.expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+          this.saveSubscriptionToStorage(subscription);
           alert('Your subscription has been reactivated!');
           location.reload();
-        } else {
-          throw new Error('Failed to reactivate subscription');
         }
-      } catch (error) {
-        console.error('Reactivation error:', error);
-        showError('Failed to reactivate subscription. Please try again.');
       }
     }
 
-    // Show error message
-    function showError(message) {
-      const errorDiv = document.getElementById('error');
-      errorDiv.textContent = message;
-      errorDiv.style.display = 'block';
-    }
+    // Initialize the static subscription manager
+    const subscriptionManager = new StaticSubscriptionManager();
 
     // Initialize page
     document.addEventListener('DOMContentLoaded', function() {
-      if (checkAuth()) {
-        loadSubscriptionStatus();
-      }
-
       // Event listeners
-      document.getElementById('subscribeButton')?.addEventListener('click', subscribe);
-      document.getElementById('cancelButton')?.addEventListener('click', cancelSubscription);
-      document.getElementById('reactivateButton')?.addEventListener('click', reactivateSubscription);
+      document.getElementById('subscribeButton')?.addEventListener('click', () => {
+        subscriptionManager.createSubscription();
+      });
+      document.getElementById('cancelButton')?.addEventListener('click', () => {
+        subscriptionManager.cancelSubscription();
+      });
+      document.getElementById('reactivateButton')?.addEventListener('click', () => {
+        subscriptionManager.reactivateSubscription();
+      });
     });
   </script>
 </body>
