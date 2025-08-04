@@ -10,7 +10,7 @@ let subscriptionPlans = {
   basic: {
     id: 'basic',
     name: 'Horror4Ever Basic',
-    price: 200, // $2.00 in cents
+    price: 500, // $5.00 in cents
     interval: 'month',
     features: [
       'No ads',

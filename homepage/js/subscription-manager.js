@@ -183,7 +183,7 @@ class SubscriptionManager {
     prompt.innerHTML = `
       <h3 style="color: #FF7518; margin-bottom: 1rem;">🎃 Remove Ads! 🎃</h3>
       <p style="color: #E0E0E0; margin-bottom: 1rem;">
-        Subscribe for just $2/month and enjoy an ad-free experience!
+        Subscribe for just $5/month and enjoy an ad-free experience!
       </p>
       <p style="color: #B0B0B0; font-size: 0.9rem; margin-bottom: 1.5rem; font-style: italic;">
         Plus, you'll help keep this horror-loving human fed! 🍕 (This site is built and run by just one person)
