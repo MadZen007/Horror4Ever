@@ -569,7 +569,7 @@
             <!-- Quick Actions -->
             <div class="quick-actions">
                 <div class="button-grid">
-                    <a href="../import-questions.html" class="admin-button">📝 Import Questions</a>
+                    <button class="admin-button" onclick="generateNewQuestions()">🎲 Generate 10 New Questions</button>
                     <a href="../H4E-Trivia-Spoke/public/index.html" class="admin-button">🎮 Test Game</a>
                     <button class="admin-button secondary" onclick="exportQuestions()">📤 Export Questions</button>
                     <button class="admin-button danger" onclick="clearPending()">🗑️ Clear Pending</button>
@@ -1173,6 +1173,40 @@
             } catch (error) {
                 console.error('Error clearing pending questions:', error);
                 showMessage('Failed to clear pending questions', 'error');
+            }
+        }
+
+        // Generate new questions manually
+        async function generateNewQuestions() {
+            if (!confirm('Generate 10 new AI questions? This will add them to the pending list for your review.')) return;
+            
+            try {
+                showMessage('Generating new questions...', 'success');
+                
+                const response = await fetch('/api/trivia/generate-questions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        count: 10
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to generate questions');
+                }
+                
+                const result = await response.json();
+                
+                showMessage(`✅ Generated ${result.generatedCount} new questions! Check the pending tab to review them.`, 'success');
+                loadQuestions();
+                loadStats();
+                
+            } catch (error) {
+                console.error('Error generating questions:', error);
+                showMessage(`Failed to generate questions: ${error.message}`, 'error');
             }
         }
 
