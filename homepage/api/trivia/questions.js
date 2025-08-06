@@ -52,9 +52,11 @@ async function handleGet(req, res) {
       console.log('API: Query result rows:', result.rows.length);
       
       if (result.rows.length === 0) {
+        console.log('API: Question not found with ID:', id);
         return res.status(404).json({ error: 'Question not found' });
       }
       
+      console.log('API: Found question:', { id: result.rows[0].id, question: result.rows[0].question });
       res.status(200).json(result.rows[0]);
       return;
     } catch (error) {
@@ -195,10 +197,14 @@ async function handleDelete(req, res) {
   console.log('DELETE: Attempting to delete question with ID:', id, 'Type:', typeof id);
   
   try {
+    // Handle large integer IDs properly - don't use parseInt for very large numbers
+    const questionId = id;
+    console.log('DELETE: Using question ID as:', questionId, 'Type:', typeof questionId);
+    
     // First, let's check if the question exists
     const checkSql = 'SELECT id, question, is_approved FROM trivia_questions WHERE id = $1';
-    console.log('DELETE: Checking if question exists with SQL:', checkSql, 'with params:', [parseInt(id)]);
-    const checkResult = await pool.query(checkSql, [parseInt(id)]);
+    console.log('DELETE: Checking if question exists with SQL:', checkSql, 'with params:', [questionId]);
+    const checkResult = await pool.query(checkSql, [questionId]);
     console.log('DELETE: Check result rows:', checkResult.rows.length);
     
     if (checkResult.rows.length === 0) {
@@ -211,8 +217,8 @@ async function handleDelete(req, res) {
     
     // Now delete the question
     const deleteSql = 'DELETE FROM trivia_questions WHERE id = $1';
-    console.log('DELETE: Executing delete SQL:', deleteSql, 'with params:', [parseInt(id)]);
-    const result = await pool.query(deleteSql, [parseInt(id)]);
+    console.log('DELETE: Executing delete SQL:', deleteSql, 'with params:', [questionId]);
+    const result = await pool.query(deleteSql, [questionId]);
     console.log('DELETE: Delete result rowCount:', result.rowCount);
     
     console.log('DELETE: Question successfully deleted');
