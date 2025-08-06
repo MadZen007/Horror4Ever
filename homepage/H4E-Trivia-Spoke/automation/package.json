@@ -1,0 +1,34 @@
+{
+  "name": "horror4ever-trivia-automation",
+  "version": "1.0.0",
+  "description": "Daily question generation automation for Horror4Ever Trivia",
+  "type": "module",
+  "main": "scheduler.js",
+  "scripts": {
+    "start": "node scheduler.js",
+    "manual": "node scheduler.js --manual",
+    "status": "node scheduler.js --status",
+    "generate": "node question-generator.js",
+    "test": "node --test test-automation.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "node-cron": "^3.0.3",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "keywords": [
+    "trivia",
+    "automation",
+    "horror",
+    "question-generation",
+    "cron"
+  ],
+  "author": "Horror4Ever Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
