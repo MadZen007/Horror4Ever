@@ -170,7 +170,12 @@ async function handlePut(req, res) {
       if (key !== 'id') {
         paramCount++;
         updateFields.push(`${key} = $${paramCount}`);
-        params.push(updates[key]);
+        // Handle options field - stringify if it's an array
+        if (key === 'options' && Array.isArray(updates[key])) {
+          params.push(JSON.stringify(updates[key]));
+        } else {
+          params.push(updates[key]);
+        }
       }
     });
     
