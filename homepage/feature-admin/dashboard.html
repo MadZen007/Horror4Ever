@@ -842,7 +842,7 @@
         // Approve a question
         async function approveQuestion(questionId) {
             try {
-                const response = await fetch(`/api/trivia/questions/${questionId}`, {
+                const response = await fetch(`/api/trivia/questions?id=${questionId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ is_approved: true })

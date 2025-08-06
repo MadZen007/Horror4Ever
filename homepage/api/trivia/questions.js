@@ -154,7 +154,13 @@ async function handlePut(req, res) {
   const { id } = req.query;
   const updates = req.body;
   
+  console.log('PUT: Attempting to update question with ID:', id, 'Type:', typeof id);
+  
   try {
+    // Handle large integer IDs properly - don't use parseInt for very large numbers
+    const questionId = id;
+    console.log('PUT: Using question ID as:', questionId, 'Type:', typeof questionId);
+    
     // Build dynamic update query
     const updateFields = [];
     const params = [];
@@ -173,16 +179,20 @@ async function handlePut(req, res) {
     }
     
     paramCount++;
-    params.push(parseInt(id));
+    params.push(questionId);
     
     const sql = `UPDATE trivia_questions SET ${updateFields.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = $${paramCount}`;
+    console.log('PUT: Executing SQL:', sql, 'with params:', params);
     
     const result = await pool.query(sql, params);
+    console.log('PUT: Update result rowCount:', result.rowCount);
     
     if (result.rowCount === 0) {
+      console.log('PUT: Question not found in database');
       return res.status(404).json({ error: 'Question not found' });
     }
     
+    console.log('PUT: Question successfully updated');
     res.status(200).json({ message: 'Question updated successfully' });
   } catch (error) {
     console.error('PUT Error:', error);
