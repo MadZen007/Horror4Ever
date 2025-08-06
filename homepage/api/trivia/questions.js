@@ -70,6 +70,8 @@ async function handleGet(req, res) {
     const params = [];
     let paramCount = 0;
     
+    console.log('GET: Fetching questions with filters:', { limit, approved, category, difficulty, random });
+    
     if (approved !== undefined) {
       paramCount++;
       sql += ` AND is_approved = $${paramCount}`;
@@ -99,6 +101,10 @@ async function handleGet(req, res) {
     params.push(parseInt(limit));
     
     const result = await pool.query(sql, params);
+    console.log('GET: Query result - found', result.rows.length, 'questions');
+    if (result.rows.length > 0) {
+      console.log('GET: Sample question IDs:', result.rows.slice(0, 3).map(q => ({ id: q.id, question: q.question.substring(0, 50) + '...', is_approved: q.is_approved })));
+    }
     res.status(200).json(result.rows);
   } catch (error) {
     console.error('GET Error:', error);
@@ -186,14 +192,30 @@ async function handlePut(req, res) {
 async function handleDelete(req, res) {
   const { id } = req.query;
   
+  console.log('DELETE: Attempting to delete question with ID:', id, 'Type:', typeof id);
+  
   try {
-    const sql = 'DELETE FROM trivia_questions WHERE id = $1';
-    const result = await pool.query(sql, [parseInt(id)]);
+    // First, let's check if the question exists
+    const checkSql = 'SELECT id, question, is_approved FROM trivia_questions WHERE id = $1';
+    console.log('DELETE: Checking if question exists with SQL:', checkSql, 'with params:', [parseInt(id)]);
+    const checkResult = await pool.query(checkSql, [parseInt(id)]);
+    console.log('DELETE: Check result rows:', checkResult.rows.length);
     
-    if (result.rowCount === 0) {
+    if (checkResult.rows.length === 0) {
+      console.log('DELETE: Question not found in database - ID does not exist');
       return res.status(404).json({ error: 'Question not found' });
     }
     
+    const question = checkResult.rows[0];
+    console.log('DELETE: Found question:', { id: question.id, question: question.question, is_approved: question.is_approved });
+    
+    // Now delete the question
+    const deleteSql = 'DELETE FROM trivia_questions WHERE id = $1';
+    console.log('DELETE: Executing delete SQL:', deleteSql, 'with params:', [parseInt(id)]);
+    const result = await pool.query(deleteSql, [parseInt(id)]);
+    console.log('DELETE: Delete result rowCount:', result.rowCount);
+    
+    console.log('DELETE: Question successfully deleted');
     res.status(200).json({ message: 'Question deleted successfully' });
   } catch (error) {
     console.error('DELETE Error:', error);
