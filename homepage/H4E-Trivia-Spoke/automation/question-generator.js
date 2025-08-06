@@ -319,22 +319,20 @@ class QuestionGenerator {
       try {
         const sql = `
           INSERT INTO trivia_questions 
-          (question, image_url, options, correct_answer, explanation, category, difficulty, is_approved, ai_generated, generated_date)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+          (question, image_url, options, correct_answer, explanation, category, difficulty, is_approved)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
           RETURNING id
         `;
         
         const params = [
           question.question,
           question.image_url,
-          question.options,
+          JSON.stringify(question.options),
           question.correct_answer,
           question.explanation,
           question.category,
           question.difficulty,
-          question.is_approved,
-          question.ai_generated,
-          question.generated_date
+          question.is_approved
         ];
         
         const result = await pool.query(sql, params);
