@@ -105,26 +105,26 @@ class QuestionGenerator {
     
     // Horror movie database for question generation
     const horrorMovies = [
-      { title: "The Exorcist", year: 1973, director: "William Friedkin", location: "Georgetown, Washington D.C." },
-      { title: "Halloween", year: 1978, director: "John Carpenter", location: "Haddonfield, Illinois" },
-      { title: "A Nightmare on Elm Street", year: 1984, director: "Wes Craven", location: "Springwood, Ohio" },
-      { title: "Friday the 13th", year: 1980, director: "Sean S. Cunningham", location: "Camp Crystal Lake" },
-      { title: "The Texas Chain Saw Massacre", year: 1974, director: "Tobe Hooper", location: "Texas" },
-      { title: "The Shining", year: 1980, director: "Stanley Kubrick", location: "The Overlook Hotel" },
-      { title: "Alien", year: 1979, director: "Ridley Scott", location: "Nostromo spaceship" },
-      { title: "Psycho", year: 1960, director: "Alfred Hitchcock", location: "Bates Motel" },
-      { title: "The Silence of the Lambs", year: 1991, director: "Jonathan Demme", location: "Baltimore, Maryland" },
-      { title: "Child's Play", year: 1988, director: "Tom Holland", location: "Chicago, Illinois" },
-      { title: "The Thing", year: 1982, director: "John Carpenter", location: "Antarctica" },
-      { title: "Evil Dead", year: 1981, director: "Sam Raimi", location: "Tennessee cabin" },
-      { title: "Poltergeist", year: 1982, director: "Tobe Hooper", location: "Cuesta Verde, California" },
-      { title: "The Omen", year: 1976, director: "Richard Donner", location: "London, England" },
-      { title: "Carrie", year: 1976, director: "Brian De Palma", location: "Chamberlain, Maine" },
-      { title: "Rosemary's Baby", year: 1968, director: "Roman Polanski", location: "New York City" },
-      { title: "The Amityville Horror", year: 1979, director: "Stuart Rosenberg", location: "Amityville, New York" },
-      { title: "The Hills Have Eyes", year: 1977, director: "Wes Craven", location: "Nevada desert" },
-      { title: "Dawn of the Dead", year: 1978, director: "George A. Romero", location: "Shopping mall" },
-      { title: "The Fly", year: 1986, director: "David Cronenberg", location: "Philadelphia" }
+      { title: "The Exorcist", year: 1973, director: "William Friedkin", location: "Georgetown, Washington D.C.", characters: { 'main villain': 'Pazuzu', 'protagonist': 'Regan MacNeil', 'final girl': 'Regan MacNeil' } },
+      { title: "Halloween", year: 1978, director: "John Carpenter", location: "Haddonfield, Illinois", characters: { 'main villain': 'Michael Myers', 'protagonist': 'Laurie Strode', 'final girl': 'Laurie Strode' } },
+      { title: "A Nightmare on Elm Street", year: 1984, director: "Wes Craven", location: "Springwood, Ohio", characters: { 'main villain': 'Freddy Krueger', 'protagonist': 'Nancy Thompson', 'final girl': 'Nancy Thompson' } },
+      { title: "Friday the 13th", year: 1980, director: "Sean S. Cunningham", location: "Camp Crystal Lake", characters: { 'main villain': 'Jason Voorhees', 'protagonist': 'Alice Hardy', 'final girl': 'Alice Hardy' } },
+      { title: "The Texas Chain Saw Massacre", year: 1974, director: "Tobe Hooper", location: "Texas", characters: { 'main villain': 'Leatherface', 'protagonist': 'Sally Hardesty', 'final girl': 'Sally Hardesty' } },
+      { title: "The Shining", year: 1980, director: "Stanley Kubrick", location: "The Overlook Hotel", characters: { 'main villain': 'Jack Torrance', 'protagonist': 'Danny Torrance', 'final girl': 'Wendy Torrance' } },
+      { title: "Alien", year: 1979, director: "Ridley Scott", location: "Nostromo spaceship", characters: { 'main villain': 'Xenomorph', 'protagonist': 'Ellen Ripley', 'final girl': 'Ellen Ripley' } },
+      { title: "Psycho", year: 1960, director: "Alfred Hitchcock", location: "Bates Motel", characters: { 'main villain': 'Norman Bates', 'protagonist': 'Marion Crane', 'final girl': 'Lila Crane' } },
+      { title: "The Silence of the Lambs", year: 1991, director: "Jonathan Demme", location: "Baltimore, Maryland", characters: { 'main villain': 'Hannibal Lecter', 'protagonist': 'Clarice Starling', 'final girl': 'Clarice Starling' } },
+      { title: "Child's Play", year: 1988, director: "Tom Holland", location: "Chicago, Illinois", characters: { 'main villain': 'Chucky', 'protagonist': 'Andy Barclay', 'final girl': 'Karen Barclay' } },
+      { title: "The Thing", year: 1982, director: "John Carpenter", location: "Antarctica", characters: { 'main villain': 'The Thing', 'protagonist': 'MacReady', 'final girl': 'MacReady' } },
+      { title: "Evil Dead", year: 1981, director: "Sam Raimi", location: "Tennessee cabin", characters: { 'main villain': 'Deadites', 'protagonist': 'Ash Williams', 'final girl': 'Ash Williams' } },
+      { title: "Poltergeist", year: 1982, director: "Tobe Hooper", location: "Cuesta Verde, California", characters: { 'main villain': 'Poltergeist', 'protagonist': 'Carol Anne Freeling', 'final girl': 'Diane Freeling' } },
+      { title: "The Omen", year: 1976, director: "Richard Donner", location: "London, England", characters: { 'main villain': 'Damien Thorn', 'protagonist': 'Robert Thorn', 'final girl': 'Katherine Thorn' } },
+      { title: "Carrie", year: 1976, director: "Brian De Palma", location: "Chamberlain, Maine", characters: { 'main villain': 'Carrie White', 'protagonist': 'Carrie White', 'final girl': 'Sue Snell' } },
+      { title: "Rosemary's Baby", year: 1968, director: "Roman Polanski", location: "New York City", characters: { 'main villain': 'Roman Castevet', 'protagonist': 'Rosemary Woodhouse', 'final girl': 'Rosemary Woodhouse' } },
+      { title: "The Amityville Horror", year: 1979, director: "Stuart Rosenberg", location: "Amityville, New York", characters: { 'main villain': 'House', 'protagonist': 'George Lutz', 'final girl': 'Kathy Lutz' } },
+      { title: "The Hills Have Eyes", year: 1977, director: "Wes Craven", location: "Nevada desert", characters: { 'main villain': 'Jupiter', 'protagonist': 'Brenda Carter', 'final girl': 'Brenda Carter' } },
+      { title: "Dawn of the Dead", year: 1978, director: "George A. Romero", location: "Shopping mall", characters: { 'main villain': 'Zombies', 'protagonist': 'Francine Parker', 'final girl': 'Francine Parker' } },
+      { title: "The Fly", year: 1986, director: "David Cronenberg", location: "Philadelphia", characters: { 'main villain': 'Brundlefly', 'protagonist': 'Seth Brundle', 'final girl': 'Veronica Quaife' } }
     ];
 
     // Filter out movies that already have many questions
@@ -139,7 +139,7 @@ class QuestionGenerator {
     const questionsToGenerate = 10;
     let generatedCount = 0;
     let attempts = 0;
-    const maxAttempts = 50;
+    const maxAttempts = 100; // Increased to account for validation failures
 
     while (generatedCount < questionsToGenerate && attempts < maxAttempts) {
       attempts++;
@@ -153,9 +153,14 @@ class QuestionGenerator {
         const newQuestion = await this.createQuestionFromTemplate(movie, template, templateKey);
         
         if (newQuestion && this.isQuestionUnique(newQuestion)) {
-          this.generatedQuestions.push(newQuestion);
-          generatedCount++;
-          console.log(`Generated question ${generatedCount}: ${newQuestion.question.substring(0, 50)}...`);
+          // Validate the question before adding it
+          if (this.validateQuestion(newQuestion)) {
+            this.generatedQuestions.push(newQuestion);
+            generatedCount++;
+            console.log(`Generated question ${generatedCount}: ${newQuestion.question.substring(0, 50)}...`);
+          } else {
+            console.log(`Question failed validation, skipping: ${newQuestion.question.substring(0, 50)}...`);
+          }
         }
       } catch (error) {
         console.error('Error generating question:', error);
@@ -276,7 +281,37 @@ class QuestionGenerator {
 
   // Generate character options (simplified)
   generateCharacterOptions(movieTitle, characterType) {
-    // This is a simplified version - in a real implementation, you'd have a database of characters
+    // Find the correct character for this movie and character type
+    const movie = this.movieDatabase.find(m => m.title === movieTitle);
+    if (!movie || !movie.characters[characterType]) {
+      console.log(`Warning: No character data found for ${movieTitle} - ${characterType}`);
+      return this.generateFallbackCharacterOptions();
+    }
+    
+    const correctCharacter = movie.characters[characterType];
+    
+    // Get other characters from different movies for wrong options
+    const allCharacters = [];
+    this.movieDatabase.forEach(m => {
+      Object.values(m.characters).forEach(char => {
+        if (char !== correctCharacter && !allCharacters.includes(char)) {
+          allCharacters.push(char);
+        }
+      });
+    });
+    
+    const options = [correctCharacter];
+    while (options.length < 4) {
+      const randomCharacter = allCharacters[Math.floor(Math.random() * allCharacters.length)];
+      if (!options.includes(randomCharacter)) {
+        options.push(randomCharacter);
+      }
+    }
+    
+    return this.shuffleArray(options);
+  }
+
+  generateFallbackCharacterOptions() {
     const characterOptions = [
       "Michael Myers", "Freddy Krueger", "Jason Voorhees", "Leatherface",
       "Chucky", "Norman Bates", "Hannibal Lecter", "Regan MacNeil",
@@ -299,6 +334,59 @@ class QuestionGenerator {
     return !this.approvedQuestions.some(existing => 
       existing.question.toLowerCase() === newQuestion.question.toLowerCase()
     );
+  }
+
+  // Fact-check the generated question
+  validateQuestion(question) {
+    console.log(`Validating question: ${question.question}`);
+    
+    // Extract movie title from question
+    const movieMatch = question.question.match(/'([^']+)'/);
+    if (!movieMatch) {
+      console.log('Warning: Could not extract movie title from question');
+      return false;
+    }
+    
+    const movieTitle = movieMatch[1];
+    const movie = this.movieDatabase.find(m => m.title === movieTitle);
+    
+    if (!movie) {
+      console.log(`Warning: Movie "${movieTitle}" not found in database`);
+      return false;
+    }
+    
+    // Validate based on question type
+    if (question.question.includes('year')) {
+      const correctYear = movie.year.toString();
+      if (question.correct_answer !== correctYear) {
+        console.log(`Error: Wrong year for ${movieTitle}. Expected: ${correctYear}, Got: ${question.correct_answer}`);
+        return false;
+      }
+    } else if (question.question.includes('directed')) {
+      if (question.correct_answer !== movie.director) {
+        console.log(`Error: Wrong director for ${movieTitle}. Expected: ${movie.director}, Got: ${question.correct_answer}`);
+        return false;
+      }
+    } else if (question.question.includes('place')) {
+      if (question.correct_answer !== movie.location) {
+        console.log(`Error: Wrong location for ${movieTitle}. Expected: ${movie.location}, Got: ${question.correct_answer}`);
+        return false;
+      }
+    } else if (question.question.includes('name of')) {
+      // Extract character type from question
+      const characterTypeMatch = question.question.match(/name of the (main villain|protagonist|final girl|monster)/);
+      if (characterTypeMatch) {
+        const characterType = characterTypeMatch[1];
+        const correctCharacter = movie.characters[characterType];
+        if (question.correct_answer !== correctCharacter) {
+          console.log(`Error: Wrong character for ${movieTitle} - ${characterType}. Expected: ${correctCharacter}, Got: ${question.correct_answer}`);
+          return false;
+        }
+      }
+    }
+    
+    console.log(`✓ Question validated successfully: ${question.question}`);
+    return true;
   }
 
   // Shuffle array
