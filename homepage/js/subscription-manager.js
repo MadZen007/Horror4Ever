@@ -161,54 +161,7 @@ class SubscriptionManager {
     };
   }
 
-  // Show subscription prompt
-  showSubscriptionPrompt() {
-    const prompt = document.createElement('div');
-    prompt.className = 'subscription-prompt';
-    prompt.style.cssText = `
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
-      border: 2px solid #FF7518;
-      border-radius: 15px;
-      padding: 2rem;
-      z-index: 10000;
-      max-width: 400px;
-      text-align: center;
-      box-shadow: 0 0 30px rgba(255, 117, 24, 0.3);
-    `;
-
-    prompt.innerHTML = `
-      <h3 style="color: #FF7518; margin-bottom: 1rem;">🎃 Remove Ads! 🎃</h3>
-      <p style="color: #E0E0E0; margin-bottom: 1rem;">
-        Subscribe for just $5/month and enjoy an ad-free experience!
-      </p>
-      <p style="color: #B0B0B0; font-size: 0.9rem; margin-bottom: 1.5rem; font-style: italic;">
-        Plus, you'll help keep this horror-loving human fed! 🍕 (This site is built and run by just one person)
-      </p>
-      <div style="display: flex; gap: 1rem; justify-content: center;">
-        <button onclick="window.location.href='subscription.html'" 
-                style="background: #FF7518; color: #000; border: none; padding: 0.8rem 1.5rem; border-radius: 6px; font-weight: bold; cursor: pointer;">
-          Subscribe Now
-        </button>
-        <button onclick="this.parentElement.parentElement.remove()" 
-                style="background: transparent; color: #B0B0B0; border: 1px solid #B0B0B0; padding: 0.8rem 1.5rem; border-radius: 6px; cursor: pointer;">
-          Maybe Later
-        </button>
-      </div>
-    `;
-
-    document.body.appendChild(prompt);
-
-    // Auto-remove after 10 seconds
-    setTimeout(() => {
-      if (prompt.parentElement) {
-        prompt.remove();
-      }
-    }, 10000);
-  }
+  // Removed showSubscriptionPrompt method as requested
 }
 
 // Global subscription manager instance
