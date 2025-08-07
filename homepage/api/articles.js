@@ -76,7 +76,7 @@ async function handleGet(req, res) {
 // POST - Create new article
 async function handleCreate(req, res) {
   try {
-    const { title, slug, author, date, summary, content, thumbnail, tags } = req.body;
+    const { title, slug, author, date, summary, content, thumbnail, tags, youtube_id } = req.body;
     
     // Validate required fields
     if (!title || !slug || !author || !content) {
@@ -101,10 +101,10 @@ async function handleCreate(req, res) {
     
     // Create article
     const result = await pool.query(
-      `INSERT INTO articles (title, slug, author, date, summary, content, thumbnail, tags, is_published, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      `INSERT INTO articles (title, slug, author, date, summary, content, thumbnail, tags, youtube_id, is_published, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
        RETURNING *`,
-      [title, slug, author, date || new Date().toISOString().split('T')[0], summary, content, thumbnail || '', tags || [], false]
+      [title, slug, author, date || new Date().toISOString().split('T')[0], summary, content, thumbnail || '', tags || [], youtube_id || null, false]
     );
     
     res.status(201).json({
@@ -127,7 +127,7 @@ async function handleCreate(req, res) {
 async function handleUpdate(req, res) {
   try {
     const { id } = req.query;
-    const { title, slug, author, date, summary, content, thumbnail, tags, is_published } = req.body;
+    const { title, slug, author, date, summary, content, thumbnail, tags, youtube_id, is_published } = req.body;
     
     if (!id) {
       return res.status(400).json({ error: 'Article ID required' });
@@ -165,11 +165,12 @@ async function handleUpdate(req, res) {
            content = COALESCE($6, content),
            thumbnail = COALESCE($7, thumbnail),
            tags = COALESCE($8, tags),
-           is_published = COALESCE($9, is_published),
+           youtube_id = COALESCE($9, youtube_id),
+           is_published = COALESCE($10, is_published),
            updated_at = CURRENT_TIMESTAMP
-       WHERE id = $10
+       WHERE id = $11
        RETURNING *`,
-      [title, slug, author, date, summary, content, thumbnail, tags, is_published, id]
+      [title, slug, author, date, summary, content, thumbnail, tags, youtube_id, is_published, id]
     );
     
     res.status(200).json({

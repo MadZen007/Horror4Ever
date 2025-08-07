@@ -116,10 +116,12 @@
       <h3>Step 1: Create Articles Table</h3>
       <p>Click the button below to create the articles table with all necessary columns and indexes:</p>
       <button onclick="setupArticlesTable()">CREATE ARTICLES TABLE</button>
-      <div id="setupResult" class="result"></div>
-    </div>
-    
-    <div class="step">
+      
+      <h3>Step 1.5: Add Video Support (New!)</h3>
+      <p>Click the button below to add video support to existing articles table:</p>
+      <button onclick="addVideoSupport()">ADD VIDEO SUPPORT</button>
+      <div id="videoSetupResult" class="result"></div>
+      
       <h3>Step 2: Test the Articles System</h3>
       <p>Once the database is set up, you can test the articles system:</p>
       <div class="test-links">
@@ -173,6 +175,53 @@
         // Re-enable button
         button.disabled = false;
         button.textContent = 'CREATE ARTICLES TABLE';
+        resultDiv.style.display = 'block';
+      }
+    }
+    
+    async function addVideoSupport() {
+      const button = event.target;
+      const resultDiv = document.getElementById('videoSetupResult');
+      
+      // Disable button and show loading
+      button.disabled = true;
+      button.textContent = 'Adding Video Support...';
+      resultDiv.style.display = 'none';
+      
+      try {
+        const response = await fetch('/api/dev-tools/setup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ action: 'add-video-support' })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+          resultDiv.className = 'result success';
+          resultDiv.innerHTML = `
+            <strong>✅ Video Support Added!</strong><br>
+            ${result.message}<br>
+            <small>Timestamp: ${result.timestamp}</small>
+          `;
+        } else {
+          throw new Error(result.error || 'Failed to add video support');
+        }
+        
+      } catch (error) {
+        console.error('Video support setup error:', error);
+        resultDiv.className = 'result error';
+        resultDiv.innerHTML = `
+          <strong>❌ Error:</strong><br>
+          ${error.message}<br>
+          <small>Check the console for more details.</small>
+        `;
+      } finally {
+        // Re-enable button
+        button.disabled = false;
+        button.textContent = 'ADD VIDEO SUPPORT';
         resultDiv.style.display = 'block';
       }
     }

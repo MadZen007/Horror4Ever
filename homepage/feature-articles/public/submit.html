@@ -272,6 +272,15 @@
         </div>
 
         <div class="form-group">
+          <label for="youtube_id">
+            YouTube Video ID 
+            <span class="info-icon" title="Optional: Add a YouTube video ID to include a video with your article">ⓘ</span>
+          </label>
+          <input type="text" id="youtube_id" name="youtube_id" placeholder="dQw4w9WgXcQ">
+          <small style="color: var(--text-muted);">Optional: Just the video ID from the YouTube URL (e.g., from https://www.youtube.com/watch?v=dQw4w9WgXcQ, use dQw4w9WgXcQ)</small>
+        </div>
+
+        <div class="form-group">
           <label for="tags">Tags</label>
           <div class="tags-input" id="tagsContainer">
             <input type="text" id="tagInput" class="tag-input" placeholder="Type a tag and press Enter...">
@@ -411,6 +420,7 @@
           summary: formData.get('summary'),
           content: formData.get('content'),
           thumbnail: thumbnailData,
+          youtube_id: formData.get('youtube_id') || null,
           tags: tags
         };
         

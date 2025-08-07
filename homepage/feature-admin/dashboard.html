@@ -610,7 +610,8 @@
             <div class="quick-actions">
                 <div class="button-grid">
                     <a href="../feature-articles/public/submit.html" class="admin-button">✍️ Submit Article</a>
-                    <a href="../feature-articles/public/index.html" class="admin-button">📰 View Articles</a>
+                    <a href="../feature-articles/public/index.html" class="admin-button">🔗 View Articles</a>
+                    <button class="admin-button" onclick="showAddVideoModal()">🎥 Add Video</button>
                 </div>
             </div>
 
@@ -1273,6 +1274,7 @@
                         <div class="question-text">
                             <strong>${article.title}</strong><br>
                             <small>By ${article.author} • ${new Date(article.date).toLocaleDateString()}</small>
+                            ${article.youtube_id ? '<br><small style="color: #ff6600;">🎥 Has Video</small>' : ''}
                         </div>
                         <div class="question-actions">
                             <button class="view-btn" onclick="viewArticleDetails('${article.id}')">👁️ View</button>
@@ -1324,12 +1326,14 @@
                             <p><strong>Status:</strong> ${article.is_published ? 'Published' : 'Draft'}</p>
                             <p><strong>Summary:</strong> ${article.summary || 'No summary'}</p>
                             <p><strong>Tags:</strong> ${article.tags ? article.tags.join(', ') : 'No tags'}</p>
+                            ${article.youtube_id ? `<p><strong>Video:</strong> <a href="https://www.youtube.com/watch?v=${article.youtube_id}" target="_blank">YouTube Video</a></p>` : ''}
                             <hr>
                             <h5>Content:</h5>
                             <div style="max-height: 300px; overflow-y: auto; background: #1a1a1a; padding: 15px; border-radius: 5px;">
                                 ${article.content}
                             </div>
                             ${article.thumbnail ? `<hr><h5>Thumbnail:</h5><img src="${article.thumbnail}" style="max-width: 200px; border-radius: 5px;">` : ''}
+                            ${article.youtube_id ? `<hr><h5>Video Preview:</h5><iframe src="https://www.youtube.com/embed/${article.youtube_id}" width="300" height="200" frameborder="0" allowfullscreen></iframe>` : ''}
                         </div>
                     </div>
                 `;
@@ -1791,6 +1795,121 @@
             if (movieCountElement) {
                 movieCountElement.textContent = count;
             }
+        }
+
+        // Show add video modal for articles
+        function showAddVideoModal() {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>🎥 Add Video to Article</h3>
+                        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+                    </div>
+                    <form id="addVideoForm" class="modal-form">
+                        <div class="form-group">
+                            <label for="articleSelect">Select Article *</label>
+                            <select id="articleSelect" required>
+                                <option value="">Choose an article...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="videoYoutubeUrl">YouTube URL *</label>
+                            <input type="url" id="videoYoutubeUrl" placeholder="https://www.youtube.com/watch?v=..." required>
+                            <small>Paste the full YouTube URL - the video ID will be extracted automatically</small>
+                        </div>
+                        
+                        <div class="form-buttons">
+                            <button type="submit" class="admin-button">🎥 Add Video</button>
+                            <button type="button" class="admin-button secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Load articles for the dropdown
+            loadArticlesForVideoModal();
+            
+            // Handle form submission
+            document.getElementById('addVideoForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const articleId = document.getElementById('articleSelect').value;
+                const youtubeUrl = document.getElementById('videoYoutubeUrl').value;
+                
+                if (!articleId) {
+                    showMessage('Please select an article', 'error');
+                    return;
+                }
+                
+                // Extract YouTube ID from URL
+                const youtubeId = extractYouTubeId(youtubeUrl);
+                if (!youtubeId) {
+                    showMessage('Invalid YouTube URL', 'error');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`/api/articles?id=${articleId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ youtube_id: youtubeId })
+                    });
+                    
+                    if (!response.ok) throw new Error('Failed to add video');
+                    
+                    showMessage('Video added successfully!', 'success');
+                    modal.remove();
+                    loadArticles();
+                    
+                } catch (error) {
+                    console.error('Error adding video:', error);
+                    showMessage('Failed to add video', 'error');
+                }
+            });
+        }
+
+        // Load articles for video modal dropdown
+        async function loadArticlesForVideoModal() {
+            try {
+                const response = await fetch('/api/articles');
+                if (!response.ok) throw new Error('Failed to load articles');
+                
+                const articles = await response.json();
+                const select = document.getElementById('articleSelect');
+                
+                // Clear existing options except the first one
+                select.innerHTML = '<option value="">Choose an article...</option>';
+                
+                // Add articles that don't already have videos
+                articles.forEach(article => {
+                    if (!article.youtube_id) {
+                        const option = document.createElement('option');
+                        option.value = article.id;
+                        option.textContent = article.title;
+                        select.appendChild(option);
+                    }
+                });
+                
+                if (select.options.length === 1) {
+                    showMessage('All articles already have videos or no articles found', 'info');
+                }
+                
+            } catch (error) {
+                console.error('Error loading articles for video modal:', error);
+                showMessage('Failed to load articles', 'error');
+            }
+        }
+
+        // Extract YouTube ID from URL
+        function extractYouTubeId(url) {
+            const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/;
+            const match = url.match(regex);
+            return match ? match[1] : null;
         }
     </script>
 </body>
