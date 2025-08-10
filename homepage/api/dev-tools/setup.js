@@ -1,5 +1,5 @@
 // Dev Tools Setup API
-import { Pool } from 'pg';
+const { Pool } = require('pg');
 
 const pool = new Pool({
   connectionString: process.env.COCKROACHDB_CONNECTION_STRING,
@@ -8,7 +8,7 @@ const pool = new Pool({
   }
 });
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
     return res.status(405).end(`Method ${req.method} Not Allowed`);
@@ -20,6 +20,9 @@ export default async function handler(req, res) {
     switch (action) {
       case 'setup-articles':
         await setupArticlesTable(req, res);
+        break;
+      case 'setup-movies':
+        await setupMoviesTable(req, res);
         break;
       case 'add-video-support':
         await addVideoSupport(req, res);
@@ -96,6 +99,44 @@ async function addVideoSupport(req, res) {
     res.status(500).json({
       success: false,
       error: 'Failed to add video support',
+      details: error.message
+    });
+  }
+} 
+
+// Setup movies table
+async function setupMoviesTable(req, res) {
+  try {
+    // Create movies table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS movies (
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        year INTEGER,
+        youtube_id VARCHAR(20) UNIQUE NOT NULL,
+        description TEXT,
+        views INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    
+    // Create indexes
+    await pool.query('CREATE INDEX IF NOT EXISTS idx_movies_youtube_id ON movies(youtube_id)');
+    await pool.query('CREATE INDEX IF NOT EXISTS idx_movies_views ON movies(views)');
+    await pool.query('CREATE INDEX IF NOT EXISTS idx_movies_year ON movies(year)');
+    
+    res.status(200).json({
+      success: true,
+      message: 'Movies table created successfully with all necessary columns and indexes',
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('Error setting up movies table:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create movies table',
       details: error.message
     });
   }

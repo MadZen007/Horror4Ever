@@ -1,5 +1,5 @@
 // API endpoint for movies CRUD operations
-import { Pool } from 'pg';
+const { Pool } = require('pg');
 
 const pool = new Pool({
   connectionString: process.env.COCKROACHDB_CONNECTION_STRING,
@@ -8,7 +8,7 @@ const pool = new Pool({
   }
 });
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   const { method } = req;
 
   try {

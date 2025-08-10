@@ -11,6 +11,8 @@ app.use(express.static('.'));
 
 // API Routes
 app.use('/api/subscription', subscriptionRouter);
+app.use('/api/movies', require('./api/movies'));
+app.use('/api/dev-tools/setup', require('./api/dev-tools/setup'));
 
 // Serve static files
 app.get('/', (req, res) => {
