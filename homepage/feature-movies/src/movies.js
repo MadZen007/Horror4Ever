@@ -54,11 +54,33 @@ function displayMovies(movies) {
   // Clear existing content
   moviesGrid.innerHTML = '';
   
+  // Log movie data for debugging
+  console.log('Loading movies:', movies);
+  
   // Create movie cards
   movies.forEach(movie => {
+    // Validate YouTube ID format
+    if (movie.youtube_id) {
+      validateYouTubeId(movie.youtube_id, movie.title);
+    }
+    
     const movieCard = createMovieCard(movie);
     moviesGrid.appendChild(movieCard);
   });
+}
+
+// Validate YouTube video ID format
+function validateYouTubeId(youtubeId, title) {
+  // YouTube video IDs should be exactly 11 characters and contain only letters, numbers, hyphens, and underscores
+  const validFormat = /^[a-zA-Z0-9_-]{11}$/;
+  
+  if (!validFormat.test(youtubeId)) {
+    console.warn(`Invalid YouTube ID format for "${title}": ${youtubeId}`);
+    return false;
+  }
+  
+  console.log(`Valid YouTube ID for "${title}": ${youtubeId}`);
+  return true;
 }
 
 // Create an individual movie card
@@ -67,13 +89,18 @@ function createMovieCard(movie) {
   card.className = 'movie-card';
   card.onclick = () => openMovie(movie.id);
   
-  // Create thumbnail (YouTube thumbnail or default)
-  const thumbnail = movie.youtube_id 
-    ? `https://img.youtube.com/vi/${movie.youtube_id}/maxresdefault.jpg`
-    : movie.thumbnail || '../../images/default-movie-thumbnail.png';
+  // Create thumbnail with multiple fallback options
+  let thumbnail;
+  if (movie.youtube_id) {
+    // Try multiple YouTube thumbnail qualities in order of preference
+    thumbnail = `https://img.youtube.com/vi/${movie.youtube_id}/maxresdefault.jpg`;
+  } else {
+    thumbnail = movie.thumbnail || '../../images/default-movie-thumbnail.png';
+  }
   
   card.innerHTML = `
-    <img src="${thumbnail}" alt="${movie.title}" class="movie-thumbnail" onerror="this.src='../../images/default-movie-thumbnail.png'">
+    <img src="${thumbnail}" alt="${movie.title}" class="movie-thumbnail" 
+         onerror="handleThumbnailError(this, '${movie.youtube_id}')">
     <div class="movie-content">
       <h3 class="movie-title">${movie.title}</h3>
       <div class="movie-year">${movie.year}</div>
@@ -82,6 +109,48 @@ function createMovieCard(movie) {
   `;
   
   return card;
+}
+
+// Handle thumbnail loading errors with fallback chain
+function handleThumbnailError(img, youtubeId) {
+  if (!youtubeId) {
+    // No YouTube ID, use default image
+    console.log('No YouTube ID provided, using default thumbnail');
+    img.src = '../../images/default-movie-thumbnail.png';
+    return;
+  }
+  
+  console.log(`Thumbnail failed for YouTube ID: ${youtubeId}, trying fallbacks...`);
+  
+  // Try different YouTube thumbnail qualities
+  const thumbnailQualities = [
+    'hqdefault.jpg',    // High quality (480x360)
+    'mqdefault.jpg',    // Medium quality (320x180)
+    'sddefault.jpg',    // Standard definition (640x480)
+    'default.jpg'       // Default (120x90)
+  ];
+  
+  const currentSrc = img.src;
+  const currentQuality = thumbnailQualities.find(quality => currentSrc.includes(quality));
+  
+  if (currentQuality) {
+    const currentIndex = thumbnailQualities.indexOf(currentQuality);
+    const nextQuality = thumbnailQualities[currentIndex + 1];
+    
+    if (nextQuality) {
+      // Try next quality
+      console.log(`Trying ${nextQuality} for ${youtubeId}`);
+      img.src = `https://img.youtube.com/vi/${youtubeId}/${nextQuality}`;
+    } else {
+      // All YouTube qualities failed, use default
+      console.log(`All YouTube thumbnails failed for ${youtubeId}, using default`);
+      img.src = '../../images/default-movie-thumbnail.png';
+    }
+  } else {
+    // Started with maxresdefault, try hqdefault
+    console.log(`maxresdefault failed for ${youtubeId}, trying hqdefault`);
+    img.src = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
+  }
 }
 
 // Open movie page
