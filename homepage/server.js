@@ -15,6 +15,7 @@ app.use('/api/movies', require('./api/movies'));
 app.use('/api/dev-tools/setup', require('./api/dev-tools/setup'));
 app.use('/api/trivia/stats', require('./api/trivia/stats'));
 app.use('/api/trivia/track', require('./api/trivia/track'));
+app.use('/api/trivia/questions', require('./api/trivia/questions'));
 
 // Serve static files
 app.get('/', (req, res) => {

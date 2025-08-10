@@ -1,7 +1,7 @@
 // Vercel API Route for Trivia Questions
 // This handles all CRUD operations for trivia questions using CockroachDB
 
-import { Pool } from 'pg';
+const { Pool } = require('pg');
 
 // CockroachDB connection configuration
 const pool = new Pool({
@@ -11,7 +11,7 @@ const pool = new Pool({
   }
 });
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   const { method, query, body } = req;
 
   try {

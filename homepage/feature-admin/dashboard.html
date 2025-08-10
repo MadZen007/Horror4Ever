@@ -572,7 +572,7 @@
                     <button class="admin-button" onclick="generateNewQuestions()">🎲 Generate 10 New Questions</button>
                     <a href="../H4E-Trivia-Spoke/public/index.html" class="admin-button">🎮 Test Game</a>
                     <button class="admin-button secondary" onclick="exportQuestions()">📤 Export Questions</button>
-                    <button class="admin-button danger" onclick="clearPending()">🗑️ Clear Pending</button>
+                    <button class="admin-button" onclick="showCreateQuestionModal()">✏️ Create Question</button>
                 </div>
             </div>
 
@@ -1911,6 +1911,131 @@
             const match = url.match(regex);
             return match ? match[1] : null;
         }
+
+        // Show create question modal
+        function showCreateQuestionModal() {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>✏️ Create New Question</h3>
+                        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+                    </div>
+                    <form id="createQuestionForm" class="modal-form">
+                        <div class="form-group">
+                            <label for="questionText">Question *</label>
+                            <textarea id="questionText" rows="3" placeholder="Enter your trivia question..." required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="correctAnswer">Correct Answer *</label>
+                            <input type="text" id="correctAnswer" placeholder="The correct answer..." required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="wrongAnswer1">Wrong Answer 1 *</label>
+                            <input type="text" id="wrongAnswer1" placeholder="First wrong answer..." required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="wrongAnswer2">Wrong Answer 2 *</label>
+                            <input type="text" id="wrongAnswer2" placeholder="Second wrong answer..." required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="wrongAnswer3">Wrong Answer 3 *</label>
+                            <input type="text" id="wrongAnswer3" placeholder="Third wrong answer..." required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="questionCategory">Category</label>
+                                <select id="questionCategory" required>
+                                    <option value="horror">Horror</option>
+                                    <option value="general">General</option>
+                                    <option value="movies">Movies</option>
+                                    <option value="books">Books</option>
+                                    <option value="tv">TV Shows</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="questionDifficulty">Difficulty</label>
+                                <select id="questionDifficulty" required>
+                                    <option value="1">Easy</option>
+                                    <option value="2">Medium</option>
+                                    <option value="3">Hard</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="questionExplanation">Explanation (Optional)</label>
+                            <textarea id="questionExplanation" rows="2" placeholder="Optional explanation for the correct answer..."></textarea>
+                        </div>
+                        
+                        <div class="form-buttons">
+                            <button type="submit" class="admin-button">✅ Create Question</button>
+                            <button type="button" class="admin-button secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Handle form submission
+            document.getElementById('createQuestionForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const correctAnswer = document.getElementById('correctAnswer').value;
+                const wrongAnswers = [
+                    document.getElementById('wrongAnswer1').value,
+                    document.getElementById('wrongAnswer2').value,
+                    document.getElementById('wrongAnswer3').value
+                ];
+                
+                // Combine all answers and shuffle them
+                const allAnswers = [correctAnswer, ...wrongAnswers];
+                const shuffledAnswers = allAnswers.sort(() => Math.random() - 0.5);
+                
+                const questionData = {
+                    question: document.getElementById('questionText').value,
+                    correct_answer: correctAnswer,
+                    options: shuffledAnswers, // API expects options array
+                    category: document.getElementById('questionCategory').value,
+                    difficulty: parseInt(document.getElementById('questionDifficulty').value),
+                    explanation: document.getElementById('questionExplanation').value || null,
+                    is_approved: true // Directly approve the question
+                };
+                
+                try {
+                    const response = await fetch('/api/trivia/questions', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(questionData)
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to create question');
+                    }
+                    
+                    const result = await response.json();
+                    
+                    showMessage('✅ Question created and approved successfully!', 'success');
+                    modal.remove();
+                    loadQuestions();
+                    loadStats();
+                    
+                } catch (error) {
+                    console.error('Error creating question:', error);
+                    showMessage(`Failed to create question: ${error.message}`, 'error');
+                }
+            });
+        }
+
     </script>
 </body>
 </html> 
