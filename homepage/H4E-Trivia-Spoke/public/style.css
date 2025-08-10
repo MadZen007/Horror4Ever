@@ -288,14 +288,12 @@ body {
   font-size: 0.9rem;
   font-weight: bold;
   transition: all 0.3s ease;
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
+  margin-top: 1rem;
+  width: 100%;
 }
 
 .stop-button:hover {
-  transform: translateY(-50%) scale(1.05);
+  transform: scale(1.05);
   box-shadow: 0 5px 15px rgba(255, 68, 68, 0.4);
 }
 
@@ -309,6 +307,7 @@ body {
 
 .question-image-container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
