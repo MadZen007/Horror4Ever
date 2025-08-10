@@ -1990,7 +1990,7 @@
                     <form id="createQuestionForm" class="modal-form">
                         <div class="form-group">
                             <label for="questionText">Question *</label>
-                            <textarea id="questionText" rows="3" placeholder="Enter your trivia question..." required></textarea>
+                            <textarea id="questionText" rows="6" placeholder="Enter your trivia question..." required></textarea>
                         </div>
                         
                         <div class="form-group">
@@ -2027,27 +2027,7 @@
                             <input type="text" id="wrongAnswer3" placeholder="Third wrong answer..." required>
                         </div>
                         
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="questionCategory">Category</label>
-                                <select id="questionCategory" required>
-                                    <option value="horror">Horror</option>
-                                    <option value="general">General</option>
-                                    <option value="movies">Movies</option>
-                                    <option value="books">Books</option>
-                                    <option value="tv">TV Shows</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="questionDifficulty">Difficulty</label>
-                                <select id="questionDifficulty" required>
-                                    <option value="1">Easy</option>
-                                    <option value="2">Medium</option>
-                                    <option value="3">Hard</option>
-                                </select>
-                            </div>
-                        </div>
+
                         
                         <div class="form-group">
                             <label for="questionExplanation">Explanation (Optional)</label>
@@ -2100,8 +2080,8 @@
                     question: document.getElementById('questionText').value,
                     correct_answer: correctAnswer,
                     options: shuffledAnswers, // API expects options array
-                    category: document.getElementById('questionCategory').value,
-                    difficulty: parseInt(document.getElementById('questionDifficulty').value),
+                    category: 'horror', // All questions are horror
+                    difficulty: 1, // Default to easy
                     explanation: document.getElementById('questionExplanation').value || null,
                     image_data: imageData, // Include image data if uploaded
                     is_approved: true // Directly approve the question
