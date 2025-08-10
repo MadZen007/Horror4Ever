@@ -39,8 +39,11 @@ export default async function handler(req, res) {
     `);
 
     const visitStats = await pool.query(`
-      SELECT COUNT(*) as total_visits
+      SELECT 
+        COUNT(DISTINCT ip_address) as unique_visits,
+        COUNT(*) as total_visits
       FROM site_visits
+      WHERE created_at > NOW() - INTERVAL '7 days'
     `);
 
     const responseStats = await pool.query(`
@@ -62,7 +65,8 @@ export default async function handler(req, res) {
       
       // Real tracking data
       gamesPlayed: parseInt(gameStats.rows[0].completed_games) || 0,
-      siteVisits: parseInt(visitStats.rows[0].total_visits) || 0,
+      siteVisits: parseInt(visitStats.rows[0].unique_visits) || 0,
+      totalPageLoads: parseInt(visitStats.rows[0].total_visits) || 0,
       averageScore: Math.round(parseFloat(gameStats.rows[0].avg_score) || 0),
       totalPlayers: parseInt(gameStats.rows[0].unique_sessions) || 0,
       totalScore: parseInt(gameStats.rows[0].total_score) || 0,

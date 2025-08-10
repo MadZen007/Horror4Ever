@@ -222,6 +222,13 @@
           // Track page visit when page loads
           window.addEventListener('load', async () => {
             try {
+              // Get or create a persistent session ID
+              let sessionId = localStorage.getItem('horror4ever_session_id');
+              if (!sessionId) {
+                sessionId = 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('horror4ever_session_id', sessionId);
+              }
+              
               await fetch('/api/trivia/track', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -231,7 +238,7 @@
                     pageUrl: window.location.href,
                     userAgent: navigator.userAgent,
                     referrer: document.referrer || '',
-                    sessionId: 'trivia-game-' + Date.now()
+                    sessionId: sessionId
                   }
                 })
               });

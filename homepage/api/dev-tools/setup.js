@@ -24,6 +24,9 @@ module.exports = async function handler(req, res) {
       case 'setup-movies':
         await setupMoviesTable(req, res);
         break;
+      case 'setup-site-visits':
+        await setupSiteVisitsTable(req, res);
+        break;
       case 'add-video-support':
         await addVideoSupport(req, res);
         break;
@@ -137,6 +140,43 @@ async function setupMoviesTable(req, res) {
     res.status(500).json({
       success: false,
       error: 'Failed to create movies table',
+      details: error.message
+    });
+  }
+} 
+
+// Setup site visits table
+async function setupSiteVisitsTable(req, res) {
+  try {
+    // Create site_visits table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS site_visits (
+        id SERIAL PRIMARY KEY,
+        page_url TEXT NOT NULL,
+        user_agent TEXT,
+        ip_address INET,
+        referrer TEXT,
+        session_id VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    
+    // Create indexes
+    await pool.query('CREATE INDEX IF NOT EXISTS idx_site_visits_ip ON site_visits(ip_address)');
+    await pool.query('CREATE INDEX IF NOT EXISTS idx_site_visits_session ON site_visits(session_id)');
+    await pool.query('CREATE INDEX IF NOT EXISTS idx_site_visits_created ON site_visits(created_at)');
+    
+    res.status(200).json({
+      success: true,
+      message: 'Site visits table created successfully with all necessary columns and indexes',
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('Error setting up site visits table:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create site visits table',
       details: error.message
     });
   }
