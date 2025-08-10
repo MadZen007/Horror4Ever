@@ -94,13 +94,13 @@
             background: #111;
             border: 2px solid #333;
             border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 30px;
+            padding: 30px;
+            margin-bottom: 50px;
         }
 
         .quick-actions {
-            margin-bottom: 20px;
-            padding-bottom: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
             border-bottom: 1px solid #333;
         }
 
@@ -113,10 +113,10 @@
         }
 
         .section-separator {
-            height: 2px;
+            height: 3px;
             background: linear-gradient(90deg, transparent, #ff6600, transparent);
-            margin: 40px 0;
-            border-radius: 1px;
+            margin: 60px 0;
+            border-radius: 2px;
         }
 
         .stats-grid {
@@ -202,8 +202,8 @@
             background: #111;
             border: 2px solid #333;
             border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
         }
 
         .questions-tabs {
@@ -387,6 +387,71 @@
             background: #2a2a2a;
             color: #fff;
             font-size: 14px;
+        }
+
+        /* Image upload styles */
+        .image-upload-area {
+            border: 2px dashed #ff6600;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            background: rgba(255, 102, 0, 0.05);
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .image-upload-area:hover {
+            border-color: #ff8c42;
+            background: rgba(255, 102, 0, 0.1);
+        }
+
+        .image-upload-area.dragover {
+            border-color: #ff8c42;
+            background: rgba(255, 102, 0, 0.15);
+            transform: scale(1.02);
+        }
+
+        .image-upload-icon {
+            font-size: 3em;
+            color: #ff6600;
+            margin-bottom: 15px;
+        }
+
+        .image-upload-text {
+            color: #fff;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .image-upload-hint {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            border: 2px solid #ff6600;
+            margin: 15px auto;
+            display: block;
+        }
+
+        .image-upload-input {
+            display: none;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
         }
         
         .edit-modal textarea {
@@ -1929,6 +1994,20 @@
                         </div>
                         
                         <div class="form-group">
+                            <label>Question Image (Optional)</label>
+                            <div class="image-upload-area" onclick="document.getElementById('questionImageInput').click()">
+                                <div class="image-upload-icon">📷</div>
+                                <div class="image-upload-text">Click to upload an image</div>
+                                <div class="image-upload-hint">or drag and drop an image file</div>
+                                <input type="file" id="questionImageInput" class="image-upload-input" accept="image/*">
+                            </div>
+                            <div id="imagePreviewContainer" style="display: none;">
+                                <img id="imagePreview" class="image-preview" alt="Preview">
+                                <button type="button" class="admin-button secondary" onclick="removeImage()" style="margin-top: 10px;">Remove Image</button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
                             <label for="correctAnswer">Correct Answer *</label>
                             <input type="text" id="correctAnswer" placeholder="The correct answer..." required>
                         </div>
@@ -1985,6 +2064,9 @@
             
             document.body.appendChild(modal);
             
+            // Set up image upload functionality
+            setupImageUpload();
+            
             // Handle form submission
             document.getElementById('createQuestionForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -2000,6 +2082,20 @@
                 const allAnswers = [correctAnswer, ...wrongAnswers];
                 const shuffledAnswers = allAnswers.sort(() => Math.random() - 0.5);
                 
+                // Get image data if uploaded
+                const imageInput = document.getElementById('questionImageInput');
+                let imageData = null;
+                
+                if (imageInput.files.length > 0) {
+                    const file = imageInput.files[0];
+                    imageData = {
+                        name: file.name,
+                        type: file.type,
+                        size: file.size,
+                        data: await fileToBase64(file)
+                    };
+                }
+                
                 const questionData = {
                     question: document.getElementById('questionText').value,
                     correct_answer: correctAnswer,
@@ -2007,6 +2103,7 @@
                     category: document.getElementById('questionCategory').value,
                     difficulty: parseInt(document.getElementById('questionDifficulty').value),
                     explanation: document.getElementById('questionExplanation').value || null,
+                    image_data: imageData, // Include image data if uploaded
                     is_approved: true // Directly approve the question
                 };
                 
@@ -2033,6 +2130,97 @@
                     console.error('Error creating question:', error);
                     showMessage(`Failed to create question: ${error.message}`, 'error');
                 }
+            });
+        }
+
+        // Image upload functionality
+        function setupImageUpload() {
+            const imageInput = document.getElementById('questionImageInput');
+            const uploadArea = document.querySelector('.image-upload-area');
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            const imagePreview = document.getElementById('imagePreview');
+            
+            if (!imageInput || !uploadArea) return;
+            
+            // Handle file selection
+            imageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    handleImageFile(file);
+                }
+            });
+            
+            // Handle drag and drop
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const file = files[0];
+                    if (file.type.startsWith('image/')) {
+                        handleImageFile(file);
+                    } else {
+                        showMessage('Please select an image file', 'error');
+                    }
+                }
+            });
+        }
+        
+        function handleImageFile(file) {
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showMessage('Image file size must be less than 5MB', 'error');
+                return;
+            }
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showMessage('Please select a valid image file', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imagePreview = document.getElementById('imagePreview');
+                const previewContainer = document.getElementById('imagePreviewContainer');
+                const uploadArea = document.querySelector('.image-upload-area');
+                
+                imagePreview.src = e.target.result;
+                previewContainer.style.display = 'block';
+                uploadArea.style.display = 'none';
+            };
+            
+            reader.readAsDataURL(file);
+        }
+        
+        function removeImage() {
+            const imageInput = document.getElementById('questionImageInput');
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            const uploadArea = document.querySelector('.image-upload-area');
+            
+            imageInput.value = '';
+            previewContainer.style.display = 'none';
+            uploadArea.style.display = 'block';
+        }
+        
+        // Convert file to base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
             });
         }
 
