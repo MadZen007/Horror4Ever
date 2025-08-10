@@ -13,6 +13,8 @@ app.use(express.static('.'));
 app.use('/api/subscription', subscriptionRouter);
 app.use('/api/movies', require('./api/movies'));
 app.use('/api/dev-tools/setup', require('./api/dev-tools/setup'));
+app.use('/api/trivia/stats', require('./api/trivia/stats'));
+app.use('/api/trivia/track', require('./api/trivia/track'));
 
 // Serve static files
 app.get('/', (req, res) => {

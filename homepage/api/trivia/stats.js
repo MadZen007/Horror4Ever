@@ -1,5 +1,5 @@
 // API endpoint for trivia statistics
-import { Pool } from 'pg';
+const { Pool } = require('pg');
 
 const pool = new Pool({
   connectionString: process.env.COCKROACHDB_CONNECTION_STRING,
@@ -8,7 +8,7 @@ const pool = new Pool({
   }
 });
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -44,7 +44,7 @@ export default async function handler(req, res) {
         COUNT(*) as total_visits
       FROM site_visits
       WHERE created_at > NOW() - INTERVAL '7 days'
-    `);
+    `).catch(() => ({ rows: [{ unique_visits: 0, total_visits: 0 }] }));
 
     const responseStats = await pool.query(`
       SELECT 
