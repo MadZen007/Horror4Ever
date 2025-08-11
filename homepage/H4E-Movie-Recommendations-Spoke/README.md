@@ -1,234 +1,280 @@
-# H4E Movie Recommendations Spoke
+# H4E Movie Research & Analysis System
 
-A sophisticated movie recommendation system for Horror4Ever that provides personalized horror movie suggestions based on user preferences, with advanced tracking and email follow-up features for subscribers.
+## Overview
+This system is designed for **research purposes only**, focusing on collecting and analyzing horror movie metadata to understand genre patterns, audience preferences, and cinematic trends. The system operates within TMDb's non-commercial API terms and is built for academic and research applications.
 
-## 🎬 Features
+## Research Objectives
+- **Data Collection**: Gather comprehensive horror movie metadata for research analysis
+- **Pattern Analysis**: Identify trends in horror subgenres, release patterns, and audience reception
+- **Preference Mapping**: Study user preference patterns for research insights
+- **Metadata Enrichment**: Build a research database of horror film characteristics
+- **Academic Research**: Support horror film studies and genre analysis
 
-### Core Functionality
-- **Preference-Based Recommendations**: Users can specify subgenre, mood, region, and timeframe
-- **TMDb Integration**: Real-time movie data from The Movie Database API
-- **Trailer Integration**: YouTube trailer playback for each recommendation
-- **Streaming Platform Links**: Direct links to where movies can be watched
-- **"Try Again" Functionality**: Get new recommendations if current ones don't appeal
+## Architecture
 
-### Subscriber-Only Features
-- **Personalized Tracking**: Monitor user behavior to improve recommendations
-- **Viewing History**: Track watched movies to avoid duplicates
-- **Email Follow-ups**: Automated rating requests sent the day after movie selection
-- **Analytics Dashboard**: Detailed insights into user preferences and behavior
+### Frontend (Research Interface)
+- **Technology**: Next.js for performant research data visualization
+- **Purpose**: Display research findings and allow researchers to interact with collected data
+- **Features**: 
+  - Research dashboard with data visualizations
+  - Preference collection for research studies
+  - Movie metadata display for analysis
+  - Research analytics and insights
 
-## 🏗️ Architecture
+### Backend (Data Processing)
+- **Technology**: Node.js with Express.js
+- **Purpose**: Handle research data collection and processing
+- **Features**:
+  - TMDb API integration for metadata collection
+  - Research data storage and retrieval
+  - Batch processing for large datasets
+  - Data validation and quality control
 
-### Frontend
-- **HTML**: Responsive interface with preference forms and movie cards
-- **CSS**: Dark horror theme with orange accents and smooth animations
-- **JavaScript**: Class-based recommendation system with TMDb API integration
+### Database (Research Repository)
+- **Technology**: CockroachDB
+- **Purpose**: Store research data with high consistency and scalability
+- **Schema**: Optimized for research queries and data analysis
 
-### Backend
-- **Node.js/Express**: RESTful API endpoints
-- **PostgreSQL/CockroachDB**: User tracking and preference storage
-- **TMDb API**: Movie data, trailers, and metadata
-- **Email Service**: Automated rating request emails
+### Data Pipeline (Cursor)
+- **Technology**: Cursor for data orchestration
+- **Purpose**: Transform, cleanse, and enrich research data
+- **Features**:
+  - Data lineage tracking
+  - Quality assurance pipelines
+  - Research data validation
+  - Automated data enrichment
 
-### Database Schema
-- `movie_recommendation_tracking`: User action tracking
-- `user_movie_history`: Watched movies and ratings
-- `rating_email_queue`: Scheduled email notifications
-- `user_movie_preferences`: Stored user preferences
+### Asynchronous Processing (Resend)
+- **Technology**: Resend for queue management
+- **Purpose**: Handle batch data imports and research processing
+- **Features**:
+  - Asynchronous data collection
+  - Research survey distribution
+  - Batch processing for large datasets
 
-## 🚀 Setup Instructions
+## Setup Instructions
 
 ### 1. Environment Variables
-Add these to your `.env` file:
+Create a `.env` file in the root directory:
 ```bash
-TMDB_API_KEY=your_tmdb_api_key_here
-COCKROACHDB_CONNECTION_STRING=your_database_connection_string
+# Database
+COCKROACHDB_CONNECTION_STRING=your_cockroachdb_connection_string
+
+# TMDb API (Research Use Only)
+TMDB_API_KEY=your_tmdb_api_key
+
+# Resend (for research communications)
+RESEND_API_KEY=your_resend_api_key
+
+# Research Configuration
+RESEARCH_MODE=true
+DATA_COLLECTION_LIMIT=1000
 ```
 
 ### 2. Database Setup
-Run the database setup script:
+Run the database setup script to create research tables:
 ```bash
 node api/setup-database.js
 ```
 
 ### 3. API Integration
-Add the recommendation routes to your main server:
+Add the research API routes to your main server:
 ```javascript
-app.use('/api/movie-recommendations', require('./H4E-Movie-Recommendations-Spoke/api/routes'));
+// In server.js
+app.use('/api/research/movies', require('./H4E-Movie-Recommendations-Spoke/api/routes'));
 ```
 
 ### 4. TMDb API Key
-Get a free API key from [The Movie Database](https://www.themoviedb.org/settings/api)
+- Visit https://www.themoviedb.org/settings/api
+- Request an API key for **research purposes only**
+- Clearly state your research objectives in the application
 
-## 📁 File Structure
-
+## File Structure
 ```
 H4E-Movie-Recommendations-Spoke/
 ├── public/
-│   ├── index.html          # Main recommendation interface
-│   └── style.css           # Styling and animations
+│   ├── index.html          # Research interface
+│   └── style.css           # Research UI styling
 ├── src/
-│   └── recommendations.js  # Frontend recommendation logic
+│   └── recommendations.js  # Research data handling
 ├── api/
-│   ├── recommendations.js  # Backend recommendation engine
-│   ├── routes.js           # Express.js API routes
-│   └── setup-database.js   # Database schema and utilities
-└── README.md               # This documentation
+│   ├── recommendations.js  # Research API logic
+│   ├── routes.js           # Research API routes
+│   └── setup-database.js   # Research database schema
+└── README.md               # This file
 ```
 
-## 🎯 User Flow
+## Research Workflow
 
-### 1. Preference Selection
-- User selects subgenre (slasher, supernatural, psychological, etc.)
-- Chooses mood (terrifying, atmospheric, gory, etc.)
-- Specifies region (domestic, foreign, any)
-- Sets timeframe (classic, 80s-90s, 2000s, etc.)
-- Option to exclude previously watched movies (subscribers only)
+### 1. Data Collection Phase
+- Users provide research preferences (subgenre, mood, timeframe)
+- System collects movie metadata from TMDb
+- Data is stored with research identifiers
+- Quality checks are performed on collected data
 
-### 2. Recommendation Display
-- System fetches 3 personalized recommendations from TMDb
-- Each movie card shows poster, title, year, rating, and description
-- "Watch Trailer" and "More Info" buttons for each movie
+### 2. Analysis Phase
+- Research data is processed through Cursor pipelines
+- Patterns and trends are identified
+- Statistical analysis is performed
+- Research insights are generated
 
-### 3. Movie Interaction
-- **Trailer Viewing**: YouTube embed with autoplay
-- **Detailed Info**: Full synopsis, genres, and streaming platforms
-- **Streaming Links**: Direct affiliate links to platforms
-- **"Not Interested"**: Tracks rejection and gets new recommendations
+### 3. Reporting Phase
+- Research findings are displayed in the interface
+- Data visualizations show trends and patterns
+- Research reports are generated
+- Academic insights are documented
 
-### 4. Subscriber Tracking
-- All user actions logged for recommendation improvement
-- Movie selections trigger next-day rating email
-- Viewing history prevents duplicate recommendations
+## API Endpoints (Research Focus)
 
-## 🔧 API Endpoints
+### GET /api/research/movies/get
+- **Purpose**: Retrieve research movie data
+- **Parameters**: Research preferences and filters
+- **Response**: Research-grade movie metadata
 
-### POST `/api/movie-recommendations/get`
-Get personalized movie recommendations
-```json
-{
-  "preferences": {
-    "subgenre": "slasher",
-    "mood": "terrifying",
-    "region": "domestic",
-    "timeframe": "recent",
-    "excludeSeen": true
-  },
-  "isSubscriber": true,
-  "rejectedMovies": [123, 456],
-  "memberToken": "user_token_here"
-}
-```
+### GET /api/research/movies/details/:id
+- **Purpose**: Get detailed research data for a specific movie
+- **Response**: Comprehensive movie metadata for analysis
 
-### GET `/api/movie-recommendations/trailer/:movieId`
-Get YouTube trailer key for a movie
+### POST /api/research/movies/track
+- **Purpose**: Track research interactions for analysis
+- **Data**: Research participant behavior patterns
 
-### GET `/api/movie-recommendations/details/:movieId`
-Get detailed movie info and streaming platforms
+### GET /api/research/analytics
+- **Purpose**: Retrieve research analytics and insights
+- **Response**: Statistical analysis and trend data
 
-### POST `/api/movie-recommendations/track`
-Track user actions for analytics
-```json
-{
-  "action": "trailer_watch",
-  "data": {
-    "movieId": 123,
-    "movieTitle": "Movie Title"
-  },
-  "memberToken": "user_token_here",
-  "timestamp": "2024-01-01T00:00:00Z"
-}
-```
+## Research Data Schema
 
-## 🎨 Customization
+### movie_research_data
+- `id`: Primary key
+- `tmdb_id`: TMDb movie identifier
+- `title`: Movie title
+- `overview`: Research description
+- `release_date`: Release date for temporal analysis
+- `vote_average`: Audience rating for research
+- `vote_count`: Sample size for statistical validity
+- `genre_ids`: Genre classification for research
+- `keywords`: Research keywords and themes
+- `research_metadata`: Additional research data
+- `created_at`: Data collection timestamp
 
-### Adding New Subgenres
-Edit `SUBGENRE_KEYWORDS` in `api/recommendations.js`:
-```javascript
-const SUBGENRE_KEYWORDS = {
-  'new-subgenre': ['keyword1', 'keyword2', 'keyword3'],
-  // ... existing subgenres
-};
-```
+### research_participants
+- `id`: Participant identifier
+- `session_id`: Research session tracking
+- `preferences`: Research preference data
+- `interactions`: Research interaction patterns
+- `created_at`: Participation timestamp
 
-### Modifying Mood Filters
-Update `MOOD_FILTERS` in `api/recommendations.js`:
-```javascript
-const MOOD_FILTERS = {
-  'new-mood': { 
-    minRating: 6.5, 
-    keywords: ['keyword1', 'keyword2'] 
-  },
-  // ... existing moods
-};
-```
+### research_analytics
+- `id`: Analytics record identifier
+- `metric_name`: Research metric being tracked
+- `metric_value`: Quantitative research data
+- `sample_size`: Statistical sample size
+- `confidence_interval`: Statistical confidence
+- `analysis_date`: Analysis timestamp
 
-### Styling Changes
-Modify `public/style.css` to match your site's theme:
-- Color variables in `:root`
-- Component-specific styles
-- Responsive breakpoints
+## Research Compliance
 
-## 📊 Analytics & Tracking
+### TMDb API Compliance
+- **Usage**: Research and academic purposes only
+- **Rate Limiting**: Strict adherence to API limits
+- **Data Attribution**: Proper attribution to TMDb
+- **Non-Commercial**: No commercial use of collected data
 
-### Tracked Actions
-- `preference_submission`: User submits preferences
-- `trailer_watch`: User watches a trailer
-- `movie_rejection`: User rejects a recommendation
-- `streaming_search`: User searches for streaming options
-- `movie_selection`: User selects a movie (triggers email)
+### Data Privacy
+- **Anonymization**: All participant data is anonymized
+- **Consent**: Clear research consent procedures
+- **Retention**: Research data retention policies
+- **Security**: Secure storage of research data
 
-### Email System
-- Automated emails sent 24 hours after movie selection
-- Rating request with 1-10 scale
-- Links back to recommendation system
-- Unsubscribe functionality
+### Research Ethics
+- **Transparency**: Clear research objectives
+- **Consent**: Informed consent for research participation
+- **Benefit**: Research benefits clearly communicated
+- **Harm Prevention**: Minimize potential research harm
 
-## 🔒 Security & Privacy
+## Customization Options
 
-- All tracking requires valid member token
-- Non-subscribers get random recommendations without tracking
-- User data stored securely in PostgreSQL/CockroachDB
-- API keys stored in environment variables
+### Research Parameters
+- **Data Collection Scope**: Adjust research data collection parameters
+- **Analysis Depth**: Configure analysis complexity
+- **Reporting Frequency**: Set research reporting intervals
+- **Quality Thresholds**: Define data quality standards
 
-## 🚀 Future Enhancements
+### Research Interface
+- **Dashboard Layout**: Customize research dashboard
+- **Data Visualizations**: Configure research charts and graphs
+- **Export Formats**: Set research data export options
+- **Access Controls**: Define research access permissions
 
-### Planned Features
-- **Machine Learning**: Improved recommendation algorithm
-- **Social Features**: Share recommendations with friends
-- **Watchlists**: Save movies for later viewing
-- **Reviews**: User-generated movie reviews
-- **Advanced Filtering**: More granular preference options
+## Analytics and Research Insights
 
-### Integration Opportunities
-- **JustWatch API**: Real streaming availability data
-- **Letterboxd API**: Import user ratings and reviews
-- **Email Marketing**: Integration with Mailchimp/SendGrid
-- **Analytics**: Google Analytics 4 integration
+### Data Collection Metrics
+- **Research Participation**: Track research participant engagement
+- **Data Quality**: Monitor research data quality metrics
+- **Collection Efficiency**: Measure data collection performance
+- **Error Rates**: Track research data collection errors
 
-## 🐛 Troubleshooting
+### Research Analytics
+- **Genre Trends**: Analyze horror subgenre popularity
+- **Temporal Patterns**: Study release date patterns
+- **Audience Preferences**: Research viewer preference patterns
+- **Quality Correlations**: Analyze rating and popularity relationships
 
-### Common Issues
-1. **TMDb API Errors**: Check API key and rate limits
-2. **Database Connection**: Verify CockroachDB connection string
-3. **Missing Trailers**: Some movies may not have YouTube trailers
-4. **Streaming Links**: Currently uses mock data (integrate JustWatch API)
+### Research Reporting
+- **Automated Reports**: Generate research insights automatically
+- **Trend Analysis**: Identify emerging horror trends
+- **Statistical Significance**: Calculate research statistical validity
+- **Academic Citations**: Generate research citations and references
 
-### Debug Mode
-Enable detailed logging by setting:
-```javascript
-process.env.DEBUG = 'movie-recommendations:*';
-```
+## Security Considerations
 
-## 📞 Support
+### Research Data Protection
+- **Encryption**: Encrypt research data at rest and in transit
+- **Access Controls**: Implement research data access controls
+- **Audit Logging**: Log all research data access
+- **Backup Procedures**: Secure research data backup procedures
 
-For issues or questions:
-1. Check the troubleshooting section
-2. Review API documentation
-3. Check TMDb API status
-4. Verify database connectivity
+### API Security
+- **Rate Limiting**: Implement research-appropriate rate limits
+- **Authentication**: Secure research API access
+- **Input Validation**: Validate all research data inputs
+- **Error Handling**: Secure error handling for research data
+
+## Future Research Enhancements
+
+### Advanced Analytics
+- **Machine Learning**: Implement ML for research pattern recognition
+- **Predictive Modeling**: Develop research prediction models
+- **Sentiment Analysis**: Analyze research participant sentiment
+- **Network Analysis**: Study horror movie influence networks
+
+### Research Collaboration
+- **Multi-Institution**: Support collaborative research projects
+- **Data Sharing**: Enable secure research data sharing
+- **Peer Review**: Implement research peer review processes
+- **Publication Support**: Generate research publication materials
+
+## Troubleshooting
+
+### Common Research Issues
+- **Data Collection Errors**: Check TMDb API status and rate limits
+- **Database Connection**: Verify CockroachDB connection settings
+- **Research Data Quality**: Monitor data quality metrics
+- **Performance Issues**: Optimize research query performance
+
+### Research Support
+- **Documentation**: Comprehensive research documentation
+- **Logging**: Detailed research operation logging
+- **Monitoring**: Real-time research system monitoring
+- **Backup Procedures**: Research data backup and recovery
+
+## Research Citation
+When using this system for research, please cite:
+- TMDb API for movie metadata
+- This research system for data collection methodology
+- Relevant academic sources for research methodology
 
 ---
 
-**Built for Horror4Ever** 🎃
-*Making horror movie discovery personal and engaging*
+**Note**: This system is designed for research and academic purposes only. All data collection and analysis must comply with applicable research ethics guidelines and institutional review board requirements.

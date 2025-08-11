@@ -1,229 +1,333 @@
+/**
+ * Horror Movie Research & Analysis Database Setup
+ * Creates research database tables and indexes for academic research purposes
+ * Designed for non-commercial research use only
+ */
+
 const { Pool } = require('pg');
 
+// Database connection for research data
 const pool = new Pool({
-  connectionString: process.env.COCKROACHDB_CONNECTION_STRING,
+    connectionString: process.env.COCKROACHDB_CONNECTION_STRING,
+    ssl: { rejectUnauthorized: false }
 });
 
-async function setupMovieRecommendationTables() {
-  try {
-    // Table for tracking user actions
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS movie_recommendation_tracking (
-        id SERIAL PRIMARY KEY,
-        member_token VARCHAR(255) NOT NULL,
-        action VARCHAR(100) NOT NULL,
-        data JSONB,
-        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-
-    // Table for user movie history (watched movies)
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS user_movie_history (
-        id SERIAL PRIMARY KEY,
-        member_token VARCHAR(255) NOT NULL,
-        movie_id INTEGER NOT NULL,
-        movie_title VARCHAR(255) NOT NULL,
-        watched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        rating INTEGER CHECK (rating >= 1 AND rating <= 10),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(member_token, movie_id)
-      )
-    `);
-
-    // Table for rating email queue
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS rating_email_queue (
-        id SERIAL PRIMARY KEY,
-        member_token VARCHAR(255) NOT NULL,
-        movie_id INTEGER NOT NULL,
-        movie_title VARCHAR(255) NOT NULL,
-        scheduled_for TIMESTAMP NOT NULL,
-        sent_at TIMESTAMP,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-
-    // Table for user preferences
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS user_movie_preferences (
-        id SERIAL PRIMARY KEY,
-        member_token VARCHAR(255) NOT NULL,
-        subgenre VARCHAR(50),
-        mood VARCHAR(50),
-        region VARCHAR(50),
-        timeframe VARCHAR(50),
-        exclude_seen BOOLEAN DEFAULT false,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-
-    // Create indexes for better performance
-    await pool.query(`
-      CREATE INDEX IF NOT EXISTS idx_movie_tracking_member_token 
-      ON movie_recommendation_tracking(member_token)
-    `);
-
-    await pool.query(`
-      CREATE INDEX IF NOT EXISTS idx_movie_tracking_action 
-      ON movie_recommendation_tracking(action)
-    `);
-
-    await pool.query(`
-      CREATE INDEX IF NOT EXISTS idx_movie_tracking_timestamp 
-      ON movie_recommendation_tracking(timestamp)
-    `);
-
-    await pool.query(`
-      CREATE INDEX IF NOT EXISTS idx_user_movie_history_member_token 
-      ON user_movie_history(member_token)
-    `);
-
-    await pool.query(`
-      CREATE INDEX IF NOT EXISTS idx_user_movie_history_movie_id 
-      ON user_movie_history(movie_id)
-    `);
-
-    await pool.query(`
-      CREATE INDEX IF NOT EXISTS idx_rating_email_queue_scheduled_for 
-      ON rating_email_queue(scheduled_for)
-    `);
-
-    await pool.query(`
-      CREATE INDEX IF NOT EXISTS idx_rating_email_queue_member_token 
-      ON rating_email_queue(member_token)
-    `);
-
-    await pool.query(`
-      CREATE INDEX IF NOT EXISTS idx_user_preferences_member_token 
-      ON user_movie_preferences(member_token)
-    `);
-
-    console.log('✅ Movie recommendation database tables created successfully');
-
-  } catch (error) {
-    console.error('❌ Error setting up movie recommendation tables:', error);
-    throw error;
-  }
+/**
+ * Create research database tables
+ */
+async function setupResearchDatabase() {
+    try {
+        console.log('Setting up Horror Movie Research & Analysis database...');
+        
+        // Create research tracking table
+        await createResearchTrackingTable();
+        
+        // Create user movie history table for research accuracy
+        await createUserMovieHistoryTable();
+        
+        // Create rating email queue for research follow-up
+        await createRatingEmailQueueTable();
+        
+        // Create user preferences table for research analysis
+        await createUserPreferencesTable();
+        
+        // Create research analytics table
+        await createResearchAnalyticsTable();
+        
+        console.log('Research database setup completed successfully');
+        
+    } catch (error) {
+        console.error('Error setting up research database:', error);
+        throw error;
+    }
 }
 
-// Function to add movie to user's watched history
-async function addWatchedMovie(memberToken, movieId, movieTitle) {
-  try {
-    await pool.query(`
-      INSERT INTO user_movie_history (member_token, movie_id, movie_title)
-      VALUES ($1, $2, $3)
-      ON CONFLICT (member_token, movie_id) 
-      DO UPDATE SET watched_at = CURRENT_TIMESTAMP
-    `, [memberToken, movieId, movieTitle]);
-  } catch (error) {
-    console.error('Error adding watched movie:', error);
-  }
+/**
+ * Create research tracking table
+ */
+async function createResearchTrackingTable() {
+    const query = `
+        CREATE TABLE IF NOT EXISTS movie_recommendation_tracking (
+            id SERIAL PRIMARY KEY,
+            session_id VARCHAR(255) NOT NULL,
+            action VARCHAR(100) NOT NULL,
+            data JSONB NOT NULL,
+            timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+            research_metadata JSONB DEFAULT '{}'::jsonb
+        );
+        
+        CREATE INDEX IF NOT EXISTS idx_research_tracking_session_id ON movie_recommendation_tracking(session_id);
+        CREATE INDEX IF NOT EXISTS idx_research_tracking_action ON movie_recommendation_tracking(action);
+        CREATE INDEX IF NOT EXISTS idx_research_tracking_timestamp ON movie_recommendation_tracking(timestamp);
+    `;
+    
+    await pool.query(query);
+    console.log('Research tracking table created');
 }
 
-// Function to save user preferences
-async function saveUserPreferences(memberToken, preferences) {
-  try {
-    await pool.query(`
-      INSERT INTO user_movie_preferences 
-        (member_token, subgenre, mood, region, timeframe, exclude_seen)
-      VALUES ($1, $2, $3, $4, $5, $6)
-      ON CONFLICT (member_token) 
-      DO UPDATE SET 
-        subgenre = EXCLUDED.subgenre,
-        mood = EXCLUDED.mood,
-        region = EXCLUDED.region,
-        timeframe = EXCLUDED.timeframe,
-        exclude_seen = EXCLUDED.exclude_seen,
-        updated_at = CURRENT_TIMESTAMP
-    `, [
-      memberToken,
-      preferences.subgenre,
-      preferences.mood,
-      preferences.region,
-      preferences.timeframe,
-      preferences.excludeSeen
+/**
+ * Create user movie history table
+ */
+async function createUserMovieHistoryTable() {
+    const query = `
+        CREATE TABLE IF NOT EXISTS user_movie_history (
+            id SERIAL PRIMARY KEY,
+            session_id VARCHAR(255) NOT NULL,
+            movie_id INTEGER NOT NULL,
+            movie_title VARCHAR(255) NOT NULL,
+            rating INTEGER CHECK (rating >= 1 AND rating <= 10),
+            watched_date TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+            research_notes TEXT,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        );
+        
+        CREATE INDEX IF NOT EXISTS idx_user_history_session_id ON user_movie_history(session_id);
+        CREATE INDEX IF NOT EXISTS idx_user_history_movie_id ON user_movie_history(movie_id);
+        CREATE INDEX IF NOT EXISTS idx_user_history_watched_date ON user_movie_history(watched_date);
+    `;
+    
+    await pool.query(query);
+    console.log('User movie history table created');
+}
+
+/**
+ * Create rating email queue table
+ */
+async function createRatingEmailQueueTable() {
+    const query = `
+        CREATE TABLE IF NOT EXISTS rating_email_queue (
+            id SERIAL PRIMARY KEY,
+            session_id VARCHAR(255) NOT NULL,
+            movie_id INTEGER NOT NULL,
+            movie_title VARCHAR(255) NOT NULL,
+            scheduled_date TIMESTAMP WITH TIME ZONE NOT NULL,
+            sent_date TIMESTAMP WITH TIME ZONE,
+            status VARCHAR(50) DEFAULT 'pending',
+            email_content TEXT,
+            research_follow_up BOOLEAN DEFAULT true,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        );
+        
+        CREATE INDEX IF NOT EXISTS idx_email_queue_session_id ON rating_email_queue(session_id);
+        CREATE INDEX IF NOT EXISTS idx_email_queue_scheduled_date ON rating_email_queue(scheduled_date);
+        CREATE INDEX IF NOT EXISTS idx_email_queue_status ON rating_email_queue(status);
+    `;
+    
+    await pool.query(query);
+    console.log('Rating email queue table created');
+}
+
+/**
+ * Create user preferences table
+ */
+async function createUserPreferencesTable() {
+    const query = `
+        CREATE TABLE IF NOT EXISTS user_movie_preferences (
+            id SERIAL PRIMARY KEY,
+            session_id VARCHAR(255) NOT NULL,
+            subgenre VARCHAR(100),
+            mood VARCHAR(100),
+            region VARCHAR(50),
+            timeframe VARCHAR(50),
+            exclude_seen BOOLEAN DEFAULT false,
+            research_consent VARCHAR(50) NOT NULL,
+            preferences_data JSONB DEFAULT '{}'::jsonb,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+            updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        );
+        
+        CREATE INDEX IF NOT EXISTS idx_preferences_session_id ON user_movie_preferences(session_id);
+        CREATE INDEX IF NOT EXISTS idx_preferences_subgenre ON user_movie_preferences(subgenre);
+        CREATE INDEX IF NOT EXISTS idx_preferences_mood ON user_movie_preferences(mood);
+        CREATE INDEX IF NOT EXISTS idx_preferences_consent ON user_movie_preferences(research_consent);
+    `;
+    
+    await pool.query(query);
+    console.log('User preferences table created');
+}
+
+/**
+ * Create research analytics table
+ */
+async function createResearchAnalyticsTable() {
+    const query = `
+        CREATE TABLE IF NOT EXISTS research_analytics (
+            id SERIAL PRIMARY KEY,
+            metric_name VARCHAR(100) NOT NULL,
+            metric_value JSONB NOT NULL,
+            sample_size INTEGER DEFAULT 0,
+            confidence_interval DECIMAL(5,4),
+            analysis_date DATE NOT NULL,
+            research_period VARCHAR(50),
+            data_source VARCHAR(100) DEFAULT 'TMDb API',
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        );
+        
+        CREATE INDEX IF NOT EXISTS idx_analytics_metric_name ON research_analytics(metric_name);
+        CREATE INDEX IF NOT EXISTS idx_analytics_analysis_date ON research_analytics(analysis_date);
+        CREATE INDEX IF NOT EXISTS idx_analytics_research_period ON research_analytics(research_period);
+    `;
+    
+    await pool.query(query);
+    console.log('Research analytics table created');
+}
+
+/**
+ * Add watched movie to research history
+ */
+async function addWatchedMovie(sessionId, movieId, movieTitle, rating = null, notes = null) {
+    const query = `
+        INSERT INTO user_movie_history 
+        (session_id, movie_id, movie_title, rating, research_notes) 
+        VALUES ($1, $2, $3, $4, $5)
+    `;
+    
+    await pool.query(query, [sessionId, movieId, movieTitle, rating, notes]);
+}
+
+/**
+ * Save user preferences for research analysis
+ */
+async function saveUserPreferences(sessionId, preferences, consent) {
+    const query = `
+        INSERT INTO user_movie_preferences 
+        (session_id, subgenre, mood, region, timeframe, exclude_seen, research_consent, preferences_data) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        ON CONFLICT (session_id) 
+        DO UPDATE SET 
+            subgenre = EXCLUDED.subgenre,
+            mood = EXCLUDED.mood,
+            region = EXCLUDED.region,
+            timeframe = EXCLUDED.timeframe,
+            exclude_seen = EXCLUDED.exclude_seen,
+            research_consent = EXCLUDED.research_consent,
+            preferences_data = EXCLUDED.preferences_data,
+            updated_at = NOW()
+    `;
+    
+    await pool.query(query, [
+        sessionId,
+        preferences.subgenre,
+        preferences.mood,
+        preferences.region,
+        preferences.timeframe,
+        preferences.excludeSeen,
+        consent,
+        JSON.stringify(preferences)
     ]);
-  } catch (error) {
-    console.error('Error saving user preferences:', error);
-  }
 }
 
-// Function to get user preferences
-async function getUserPreferences(memberToken) {
-  try {
-    const result = await pool.query(`
-      SELECT subgenre, mood, region, timeframe, exclude_seen
-      FROM user_movie_preferences
-      WHERE member_token = $1
-    `, [memberToken]);
-    
+/**
+ * Get user preferences for research analysis
+ */
+async function getUserPreferences(sessionId) {
+    const query = 'SELECT * FROM user_movie_preferences WHERE session_id = $1';
+    const result = await pool.query(query, [sessionId]);
     return result.rows[0] || null;
-  } catch (error) {
-    console.error('Error getting user preferences:', error);
-    return null;
-  }
 }
 
-// Function to get pending rating emails
+/**
+ * Get pending rating emails for research follow-up
+ */
 async function getPendingRatingEmails() {
-  try {
-    const result = await pool.query(`
-      SELECT id, member_token, movie_id, movie_title, scheduled_for
-      FROM rating_email_queue
-      WHERE sent_at IS NULL AND scheduled_for <= CURRENT_TIMESTAMP
-      ORDER BY scheduled_for ASC
-    `);
+    const query = `
+        SELECT * FROM rating_email_queue 
+        WHERE status = 'pending' 
+        AND scheduled_date <= NOW()
+        ORDER BY scheduled_date ASC
+    `;
     
+    const result = await pool.query(query);
     return result.rows;
-  } catch (error) {
-    console.error('Error getting pending rating emails:', error);
-    return [];
-  }
 }
 
-// Function to mark email as sent
+/**
+ * Mark email as sent for research tracking
+ */
 async function markEmailAsSent(emailId) {
-  try {
-    await pool.query(`
-      UPDATE rating_email_queue
-      SET sent_at = CURRENT_TIMESTAMP
-      WHERE id = $1
-    `, [emailId]);
-  } catch (error) {
-    console.error('Error marking email as sent:', error);
-  }
-}
-
-// Function to get user tracking analytics
-async function getUserAnalytics(memberToken) {
-  try {
-    const result = await pool.query(`
-      SELECT 
-        action,
-        COUNT(*) as count,
-        DATE(timestamp) as date
-      FROM movie_recommendation_tracking
-      WHERE member_token = $1
-      GROUP BY action, DATE(timestamp)
-      ORDER BY date DESC, count DESC
-    `, [memberToken]);
+    const query = `
+        UPDATE rating_email_queue 
+        SET status = 'sent', sent_date = NOW() 
+        WHERE id = $1
+    `;
     
-    return result.rows;
-  } catch (error) {
-    console.error('Error getting user analytics:', error);
-    return [];
-  }
+    await pool.query(query, [emailId]);
 }
 
+/**
+ * Get research analytics data
+ */
+async function getUserAnalytics(sessionId) {
+    const query = `
+        SELECT 
+            COUNT(*) as total_interactions,
+            COUNT(DISTINCT action) as unique_actions,
+            MIN(timestamp) as first_interaction,
+            MAX(timestamp) as last_interaction
+        FROM movie_recommendation_tracking 
+        WHERE session_id = $1
+    `;
+    
+    const result = await pool.query(query, [sessionId]);
+    return result.rows[0] || null;
+}
+
+/**
+ * Get research participation statistics
+ */
+async function getResearchStats() {
+    const stats = {};
+    
+    // Total research sessions
+    const sessionsResult = await pool.query(`
+        SELECT COUNT(DISTINCT session_id) as total_sessions 
+        FROM movie_recommendation_tracking
+    `);
+    stats.totalSessions = sessionsResult.rows[0]?.total_sessions || 0;
+    
+    // Total movies analyzed
+    const moviesResult = await pool.query(`
+        SELECT COUNT(DISTINCT movie_id) as total_movies 
+        FROM user_movie_history
+    `);
+    stats.totalMovies = moviesResult.rows[0]?.total_movies || 0;
+    
+    // Preference distribution
+    const preferencesResult = await pool.query(`
+        SELECT 
+            subgenre,
+            mood,
+            COUNT(*) as count
+        FROM user_movie_preferences 
+        GROUP BY subgenre, mood
+        ORDER BY count DESC
+    `);
+    stats.preferenceDistribution = preferencesResult.rows;
+    
+    return stats;
+}
+
+// Export functions for use in other modules
 module.exports = {
-  setupMovieRecommendationTables,
-  addWatchedMovie,
-  saveUserPreferences,
-  getUserPreferences,
-  getPendingRatingEmails,
-  markEmailAsSent,
-  getUserAnalytics
+    setupResearchDatabase,
+    addWatchedMovie,
+    saveUserPreferences,
+    getUserPreferences,
+    getPendingRatingEmails,
+    markEmailAsSent,
+    getUserAnalytics,
+    getResearchStats
 };
+
+// Run setup if this file is executed directly
+if (require.main === module) {
+    setupResearchDatabase()
+        .then(() => {
+            console.log('Research database setup completed');
+            process.exit(0);
+        })
+        .catch((error) => {
+            console.error('Research database setup failed:', error);
+            process.exit(1);
+        });
+}
