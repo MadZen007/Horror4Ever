@@ -327,6 +327,19 @@ function getStreamingPlatforms(movieId) {
  */
 async function getSeenMovies(sessionId) {
     try {
+        // Check if table exists first
+        const tableExists = await pool.query(`
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables 
+                WHERE table_name = 'user_movie_history'
+            );
+        `);
+        
+        if (!tableExists.rows[0].exists) {
+            console.log('user_movie_history table does not exist, skipping seen movies check');
+            return [];
+        }
+        
         const query = 'SELECT movie_id FROM user_movie_history WHERE session_id = $1';
         const result = await pool.query(query, [sessionId]);
         return result.rows.map(row => row.movie_id);
@@ -341,6 +354,19 @@ async function getSeenMovies(sessionId) {
  */
 async function trackResearchDataCollection(sessionId, preferences, resultCount) {
     try {
+        // Check if table exists first
+        const tableExists = await pool.query(`
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables 
+                WHERE table_name = 'movie_recommendation_tracking'
+            );
+        `);
+        
+        if (!tableExists.rows[0].exists) {
+            console.log('movie_recommendation_tracking table does not exist, skipping tracking');
+            return;
+        }
+        
         const query = `
             INSERT INTO movie_recommendation_tracking 
             (session_id, action, data, timestamp) 
@@ -370,6 +396,19 @@ async function trackResearchDataCollection(sessionId, preferences, resultCount) 
  */
 async function trackResearchAction(action, data) {
     try {
+        // Check if table exists first
+        const tableExists = await pool.query(`
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables 
+                WHERE table_name = 'movie_recommendation_tracking'
+            );
+        `);
+        
+        if (!tableExists.rows[0].exists) {
+            console.log('movie_recommendation_tracking table does not exist, skipping action tracking');
+            return;
+        }
+        
         const query = `
             INSERT INTO movie_recommendation_tracking 
             (session_id, action, data, timestamp) 
@@ -393,6 +432,19 @@ async function trackResearchAction(action, data) {
  */
 async function scheduleRatingEmail(sessionId, movieId, movieTitle) {
     try {
+        // Check if table exists first
+        const tableExists = await pool.query(`
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables 
+                WHERE table_name = 'rating_email_queue'
+            );
+        `);
+        
+        if (!tableExists.rows[0].exists) {
+            console.log('rating_email_queue table does not exist, skipping email scheduling');
+            return;
+        }
+        
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         
@@ -417,11 +469,16 @@ async function scheduleRatingEmail(sessionId, movieId, movieTitle) {
 // API Route Handlers
 async function handleGetRecommendations(req, res) {
     try {
+        console.log('Recommendations API called with body:', req.body);
+        
         const { preferences, consent, rejectedMovies, sessionId } = req.body;
         
         if (!preferences || !consent) {
+            console.log('Missing preferences or consent:', { preferences, consent });
             return res.status(400).json({ error: 'Research preferences and consent required' });
         }
+        
+        console.log('Getting recommendations for preferences:', preferences);
         
         const recommendations = await getResearchRecommendations(
             preferences, 
@@ -429,6 +486,8 @@ async function handleGetRecommendations(req, res) {
             rejectedMovies || [], 
             sessionId
         );
+        
+        console.log(`Found ${recommendations.length} recommendations`);
         
         res.json({ 
             recommendations,
@@ -442,7 +501,7 @@ async function handleGetRecommendations(req, res) {
         
     } catch (error) {
         console.error('Research API error:', error);
-        res.status(500).json({ error: 'Research data collection failed' });
+        res.status(500).json({ error: 'Research data collection failed', details: error.message });
     }
 }
 
@@ -501,19 +560,6 @@ async function handleTrackAction(req, res) {
     }
 }
 
-module.exports = {
-    handleGetRecommendations,
-    handleGetTrailer,
-    handleGetDetails,
-    handleTrackAction,
-    getResearchRecommendations,
-    getMovieDetails,
-    getMovieTrailer,
-    getStreamingPlatforms,
-    trackResearchAction,
-    scheduleRatingEmail
-};
-
 // Express Router Setup
 const express = require('express');
 const router = express.Router();
@@ -530,4 +576,17 @@ router.get('/details/:movieId', handleGetDetails);
 // POST /api/movies/recommendations/track - Track research actions
 router.post('/track', handleTrackAction);
 
+// Export both the router and individual functions for testing
 module.exports = router;
+module.exports.functions = {
+    handleGetRecommendations,
+    handleGetTrailer,
+    handleGetDetails,
+    handleTrackAction,
+    getResearchRecommendations,
+    getMovieDetails,
+    getMovieTrailer,
+    getStreamingPlatforms,
+    trackResearchAction,
+    scheduleRatingEmail
+};
