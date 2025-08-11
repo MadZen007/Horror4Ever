@@ -723,6 +723,7 @@
                 <div class="button-grid">
                     <button class="admin-button" onclick="showAddMovieModal()">🎬 Add Movie</button>
                     <a href="../feature-movies/public/index.html" class="admin-button">🎬 View Movies</a>
+                    <button class="admin-button" onclick="showMovieDatabaseModal()">🔍 Movie Database Query</button>
                     <button class="admin-button secondary" onclick="addViewsColumn()">📊 Add Views Column</button>
                     <button class="admin-button secondary" onclick="loadMovies()">🔄 Refresh Movies</button>
                 </div>
@@ -2202,6 +2203,204 @@
                 reader.onload = () => resolve(reader.result);
                 reader.onerror = error => reject(error);
             });
+        }
+
+        // Show movie database query modal
+        function showMovieDatabaseModal() {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 900px;">
+                    <div class="modal-header">
+                        <h3>🔍 Movie Database Research Query</h3>
+                        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div style="margin-bottom: 20px; padding: 15px; background: rgba(255, 102, 0, 0.1); border-radius: 8px; border-left: 4px solid #ff6600;">
+                            <strong>Research Purpose:</strong> This tool allows you to query the TMDB horror movie database for academic research purposes. 
+                            All queries are logged for research analysis.
+                        </div>
+                        
+                        <form id="movieDatabaseForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="querySubgenre">Horror Subgenre *</label>
+                                    <select id="querySubgenre" required>
+                                        <option value="">Select a subgenre...</option>
+                                        <option value="slasher">Slasher</option>
+                                        <option value="supernatural">Supernatural</option>
+                                        <option value="psychological">Psychological</option>
+                                        <option value="found-footage">Found Footage</option>
+                                        <option value="body-horror">Body Horror</option>
+                                        <option value="folk-horror">Folk Horror</option>
+                                        <option value="cosmic-horror">Cosmic Horror</option>
+                                        <option value="zombie">Zombie</option>
+                                        <option value="vampire">Vampire</option>
+                                        <option value="any">Any Horror</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="queryMood">Mood Preference</label>
+                                    <select id="queryMood">
+                                        <option value="any">Any Mood</option>
+                                        <option value="terrifying">Terrifying</option>
+                                        <option value="atmospheric">Atmospheric</option>
+                                        <option value="gory">Gory</option>
+                                        <option value="psychological">Psychological</option>
+                                        <option value="campy">Campy</option>
+                                        <option value="artistic">Artistic</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="queryTimeframe">Time Period</label>
+                                    <select id="queryTimeframe">
+                                        <option value="any">Any Time</option>
+                                        <option value="classic">Classic (1900-1979)</option>
+                                        <option value="80s-90s">80s-90s</option>
+                                        <option value="2000s">2000s</option>
+                                        <option value="recent">Recent (2010+)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="queryRegion">Region</label>
+                                    <select id="queryRegion">
+                                        <option value="any">Any Region</option>
+                                        <option value="domestic">Domestic (US)</option>
+                                        <option value="foreign">Foreign</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+
+                            
+                            <div class="form-buttons">
+                                <button type="submit" class="admin-button">🔍 Query Database</button>
+                                <button type="button" class="admin-button secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+                            </div>
+                        </form>
+                        
+                        <div id="queryResults" style="margin-top: 30px; display: none;">
+                            <h4 style="color: #ff6600; margin-bottom: 15px;">Query Results</h4>
+                            <div id="resultsList"></div>
+                        </div>
+                        
+                        <div id="queryLoading" style="display: none; text-align: center; padding: 20px;">
+                            <div style="color: #ff6600; font-size: 1.2em;">🔍 Querying TMDB database...</div>
+                            <div style="margin-top: 10px; color: #888;">This may take a few moments</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Handle form submission
+            document.getElementById('movieDatabaseForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const queryData = {
+                    subgenre: document.getElementById('querySubgenre').value,
+                    mood: document.getElementById('queryMood').value,
+                    timeframe: document.getElementById('queryTimeframe').value,
+                    region: document.getElementById('queryRegion').value
+                };
+                
+                // Show loading
+                document.getElementById('queryLoading').style.display = 'block';
+                document.getElementById('queryResults').style.display = 'none';
+                
+                try {
+                    const response = await fetch('/api/movies/recommendations', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            preferences: queryData,
+                            consent: true,
+                            sessionId: 'admin-query-' + Date.now()
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to query database');
+                    }
+                    
+                    const results = await response.json();
+                    
+                    // Hide loading and show results
+                    document.getElementById('queryLoading').style.display = 'none';
+                    document.getElementById('queryResults').style.display = 'block';
+                    
+                    displayQueryResults(results);
+                    
+                } catch (error) {
+                    console.error('Error querying movie database:', error);
+                    document.getElementById('queryLoading').style.display = 'none';
+                    showMessage(`Failed to query database: ${error.message}`, 'error');
+                }
+            });
+        }
+        
+        // Display query results
+        function displayQueryResults(results) {
+            const resultsList = document.getElementById('resultsList');
+            
+            if (!results || results.length === 0) {
+                resultsList.innerHTML = '<div style="color: #888; text-align: center; padding: 20px;">No movies found matching your criteria</div>';
+                return;
+            }
+            
+            resultsList.innerHTML = results.map(movie => `
+                <div style="background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                    <div style="display: flex; align-items: flex-start; gap: 15px;">
+                        <img src="${movie.poster_path ? 'https://image.tmdb.org/t/p/w92' + movie.poster_path : '../images/default-movie-thumbnail.png'}" 
+                             alt="${movie.title}" 
+                             style="width: 60px; height: 90px; object-fit: cover; border-radius: 4px;">
+                        
+                        <div style="flex: 1;">
+                            <h5 style="color: #ff6600; margin: 0 0 8px 0; font-size: 1.1em;">${movie.title} (${movie.release_date ? movie.release_date.split('-')[0] : 'N/A'})</h5>
+                            <p style="color: #ccc; margin: 0 0 8px 0; font-size: 0.9em;">${movie.overview || 'No overview available'}</p>
+                            <div style="display: flex; gap: 15px; font-size: 0.8em; color: #888;">
+                                <span>⭐ ${movie.vote_average || 'N/A'}/10</span>
+                                <span>📅 ${movie.release_date || 'N/A'}</span>
+                                <span>🎭 ${movie.genre_names ? movie.genre_names.join(', ') : 'Horror'}</span>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <button class="admin-button" style="font-size: 0.8em; padding: 6px 12px;" 
+                                    onclick="viewMovieDetails('${movie.id}')">👁️ Details</button>
+                            <button class="admin-button secondary" style="font-size: 0.8em; padding: 6px 12px;" 
+                                    onclick="getMovieTrailer('${movie.id}')">🎬 Trailer</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Get movie trailer
+        async function getMovieTrailer(movieId) {
+            try {
+                const response = await fetch(`/api/movies/trailer?movieId=${movieId}`);
+                if (!response.ok) throw new Error('Failed to get trailer');
+                
+                const trailerData = await response.json();
+                
+                if (trailerData.trailer_url) {
+                    window.open(trailerData.trailer_url, '_blank');
+                } else {
+                    showMessage('No trailer available for this movie', 'info');
+                }
+                
+            } catch (error) {
+                console.error('Error getting trailer:', error);
+                showMessage('Failed to get trailer', 'error');
+            }
         }
 
     </script>
