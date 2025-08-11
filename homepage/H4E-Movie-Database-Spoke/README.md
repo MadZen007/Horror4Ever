@@ -81,7 +81,7 @@ node api/setup-database.js
 Add the research API routes to your main server:
 ```javascript
 // In server.js
-app.use('/api/research/movies', require('./H4E-Movie-Recommendations-Spoke/api/routes'));
+app.use('/api/research/movies', require('./H4E-Movie-Database-Spoke/api/routes'));
 ```
 
 ### 4. TMDb API Key
@@ -91,7 +91,7 @@ app.use('/api/research/movies', require('./H4E-Movie-Recommendations-Spoke/api/r
 
 ## File Structure
 ```
-H4E-Movie-Recommendations-Spoke/
+H4E-Movie-Database-Spoke/
 ├── public/
 │   ├── index.html          # Research interface
 │   └── style.css           # Research UI styling
