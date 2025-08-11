@@ -19,6 +19,12 @@ app.use('/api/trivia/stats', require('./api/trivia/stats'));
 app.use('/api/trivia/track', require('./api/trivia/track'));
 app.use('/api/trivia/questions', require('./api/trivia/questions'));
 
+// TMDB Status Routes
+const tmdbStatus = require('./api/tmdb-status');
+app.get('/api/tmdb/status', tmdbStatus.getTMDBStatus);
+app.post('/api/tmdb/update', tmdbStatus.updateTMDBStatus);
+app.get('/api/tmdb/check-update', tmdbStatus.checkDailyUpdate);
+
 // Serve static files
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));

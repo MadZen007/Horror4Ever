@@ -30,6 +30,9 @@ module.exports = async function handler(req, res) {
       case 'add-video-support':
         await addVideoSupport(req, res);
         break;
+      case 'setup-tmdb-status':
+        await setupTMDBStatusTable(req, res);
+        break;
       default:
         res.status(400).json({ error: 'Invalid action' });
     }
@@ -177,6 +180,41 @@ async function setupSiteVisitsTable(req, res) {
     res.status(500).json({
       success: false,
       error: 'Failed to create site visits table',
+      details: error.message
+    });
+  }
+}
+
+// Setup TMDB status table
+async function setupTMDBStatusTable(req, res) {
+  try {
+    // Create tmdb_update_status table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS tmdb_update_status (
+        id SERIAL PRIMARY KEY,
+        last_update TIMESTAMP NOT NULL,
+        next_update TIMESTAMP NOT NULL,
+        status VARCHAR(50) DEFAULT 'pending',
+        movies_count INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    
+    // Create indexes
+    await pool.query('CREATE INDEX IF NOT EXISTS idx_tmdb_status_last_update ON tmdb_update_status(last_update)');
+    await pool.query('CREATE INDEX IF NOT EXISTS idx_tmdb_status_next_update ON tmdb_update_status(next_update)');
+    
+    res.status(200).json({
+      success: true,
+      message: 'TMDB status table created successfully with all necessary columns and indexes',
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('Error setting up TMDB status table:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create TMDB status table',
       details: error.message
     });
   }

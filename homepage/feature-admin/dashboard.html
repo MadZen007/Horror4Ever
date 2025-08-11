@@ -717,6 +717,10 @@
                     <div class="stat-number" id="movieCount">-</div>
                     <div class="stat-label">Total Movies</div>
                 </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="tmdbLastUpdate">-</div>
+                    <div class="stat-label">TMDB Last Updated</div>
+                </div>
             </div>
             
             <!-- Quick Actions -->
@@ -727,6 +731,7 @@
                     <button class="admin-button" onclick="showMovieDatabaseModal()">🔍 Movie Database Query</button>
                     <button class="admin-button secondary" onclick="addViewsColumn()">📊 Add Views Column</button>
                     <button class="admin-button secondary" onclick="loadMovies()">🔄 Refresh Movies</button>
+                    <button class="admin-button secondary" onclick="setupTMDBStatus()">📊 Setup TMDB Status</button>
                 </div>
             </div>
 
@@ -771,10 +776,13 @@
         // Load dashboard statistics
         async function loadStats() {
             try {
-                const response = await fetch('/api/trivia/stats');
-                if (!response.ok) throw new Error('Failed to load stats');
+                const [statsResponse, tmdbResponse] = await Promise.all([
+                    fetch('/api/trivia/stats'),
+                    fetch('/api/tmdb/status')
+                ]);
                 
-                const stats = await response.json();
+                if (!statsResponse.ok) throw new Error('Failed to load stats');
+                const stats = await statsResponse.json();
                 
                 document.getElementById('totalQuestions').textContent = stats.total || 0;
                 document.getElementById('approvedQuestions').textContent = stats.approved || 0;
@@ -783,9 +791,52 @@
                 document.getElementById('totalVisits').textContent = stats.siteVisits || 0;
                 document.getElementById('avgScore').textContent = stats.averageScore || 0;
                 
+                // Load TMDB status
+                if (tmdbResponse.ok) {
+                    const tmdbStatus = await tmdbResponse.json();
+                    displayTMDBStatus(tmdbStatus);
+                }
+                
             } catch (error) {
                 console.error('Error loading stats:', error);
                 showMessage('Failed to load statistics', 'error');
+            }
+        }
+        
+        // Display TMDB status
+        function displayTMDBStatus(status) {
+            const tmdbElement = document.getElementById('tmdbLastUpdate');
+            
+            if (status.lastUpdate) {
+                const lastUpdate = new Date(status.lastUpdate);
+                const now = new Date();
+                const hoursAgo = Math.round((now - lastUpdate) / (1000 * 60 * 60));
+                
+                let displayText = '';
+                if (hoursAgo < 1) {
+                    displayText = 'Just now';
+                } else if (hoursAgo < 24) {
+                    displayText = `${hoursAgo}h ago`;
+                } else {
+                    const daysAgo = Math.round(hoursAgo / 24);
+                    displayText = `${daysAgo}d ago`;
+                }
+                
+                tmdbElement.textContent = displayText;
+                tmdbElement.title = `Last updated: ${lastUpdate.toLocaleString()}\nNext update: ${new Date(status.nextUpdate).toLocaleString()}\nStatus: ${status.status}`;
+                
+                // Color coding based on update age
+                if (hoursAgo < 24) {
+                    tmdbElement.style.color = '#4CAF50'; // Green for recent
+                } else if (hoursAgo < 48) {
+                    tmdbElement.style.color = '#FF9800'; // Orange for getting old
+                } else {
+                    tmdbElement.style.color = '#f44336'; // Red for very old
+                }
+            } else {
+                tmdbElement.textContent = 'Never';
+                tmdbElement.style.color = '#f44336';
+                tmdbElement.title = 'No previous update found';
             }
         }
 
@@ -1855,6 +1906,34 @@
                 showMessage('Failed to add views column: ' + error.message, 'error');
             }
         }
+        
+        // Setup TMDB status table
+        async function setupTMDBStatus() {
+            try {
+                const response = await fetch('/api/dev-tools/setup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ action: 'setup-tmdb-status' })
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Failed to setup TMDB status table: ${response.status} - ${errorText}`);
+                }
+                
+                const result = await response.json();
+                showMessage(result.message || 'TMDB status table setup successfully!', 'success');
+                
+                // Reload stats to show TMDB status
+                loadStats();
+                
+            } catch (error) {
+                console.error('Error setting up TMDB status table:', error);
+                showMessage('Failed to setup TMDB status table: ' + error.message, 'error');
+            }
+        }
 
         // Update movie count display
         function updateMovieCount(count) {
@@ -2220,8 +2299,8 @@
                         <form id="movieDatabaseForm">
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label for="querySubgenre">Horror Subgenre *</label>
-                                    <select id="querySubgenre" required>
+                                    <label for="querySubgenre">Horror Subgenre</label>
+                                    <select id="querySubgenre">
                                         <option value="">Select a subgenre...</option>
                                         <option value="slasher">Slasher</option>
                                         <option value="supernatural">Supernatural</option>
