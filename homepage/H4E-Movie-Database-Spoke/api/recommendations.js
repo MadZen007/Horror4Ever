@@ -513,3 +513,21 @@ module.exports = {
     trackResearchAction,
     scheduleRatingEmail
 };
+
+// Express Router Setup
+const express = require('express');
+const router = express.Router();
+
+// POST /api/movies/recommendations - Get movie recommendations
+router.post('/', handleGetRecommendations);
+
+// GET /api/movies/recommendations/trailer/:movieId - Get movie trailer
+router.get('/trailer/:movieId', handleGetTrailer);
+
+// GET /api/movies/recommendations/details/:movieId - Get movie details
+router.get('/details/:movieId', handleGetDetails);
+
+// POST /api/movies/recommendations/track - Track research actions
+router.post('/track', handleTrackAction);
+
+module.exports = router;

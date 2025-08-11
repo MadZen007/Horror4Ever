@@ -13,6 +13,7 @@ app.use(express.static('.'));
 // API Routes
 app.use('/api/subscription', subscriptionRouter);
 app.use('/api/movies', require('./api/movies'));
+app.use('/api/movies/recommendations', require('./H4E-Movie-Database-Spoke/api/recommendations'));
 app.use('/api/dev-tools/setup', require('./api/dev-tools/setup'));
 app.use('/api/trivia/stats', require('./api/trivia/stats'));
 app.use('/api/trivia/track', require('./api/trivia/track'));
