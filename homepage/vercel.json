@@ -14,6 +14,10 @@
     {
       "src": "/(.*)",
       "dest": "/homepage/$1"
+    },
+    {
+      "src": "/",
+      "dest": "/homepage/index.html"
     }
   ]
 }
