@@ -2216,11 +2216,6 @@
                         <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <div style="margin-bottom: 20px; padding: 15px; background: rgba(255, 102, 0, 0.1); border-radius: 8px; border-left: 4px solid #ff6600;">
-                            <strong>Research Purpose:</strong> This tool allows you to query the TMDB horror movie database for academic research purposes. 
-                            All queries are logged for research analysis.
-                        </div>
-                        
                         <form id="movieDatabaseForm">
                             <div class="form-row">
                                 <div class="form-group">
@@ -2276,13 +2271,20 @@
                                 </div>
                             </div>
                             
-
+                            <div class="form-group">
+                                <label for="queryQuestion">Your Research Question *</label>
+                                <textarea id="queryQuestion" required placeholder="Describe what you're looking for in horror movies... (e.g., 'I want to find psychological horror films that explore themes of isolation and paranoia')" rows="4" style="width: 100%; padding: 12px; border: 2px solid #333; border-radius: 8px; background: #222; color: #fff; font-family: inherit; resize: vertical;"></textarea>
+                            </div>
                             
                             <div class="form-buttons">
                                 <button type="submit" class="admin-button">🔍 Query Database</button>
                                 <button type="button" class="admin-button secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
                             </div>
                         </form>
+                        
+                        <div style="margin-top: 20px; padding: 10px; background: rgba(255, 102, 0, 0.05); border-radius: 6px; border-left: 3px solid #ff6600; font-size: 0.85em; color: #888;">
+                            <strong>* Research Purpose:</strong> This tool allows you to query the TMDB horror movie database for academic research purposes. All queries are logged for research analysis.
+                        </div>
                         
                         <div id="queryResults" style="margin-top: 30px; display: none;">
                             <h4 style="color: #ff6600; margin-bottom: 15px;">Query Results</h4>
@@ -2307,7 +2309,8 @@
                     subgenre: document.getElementById('querySubgenre').value,
                     mood: document.getElementById('queryMood').value,
                     timeframe: document.getElementById('queryTimeframe').value,
-                    region: document.getElementById('queryRegion').value
+                    region: document.getElementById('queryRegion').value,
+                    question: document.getElementById('queryQuestion').value
                 };
                 
                 // Show loading
