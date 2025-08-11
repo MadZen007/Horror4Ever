@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <title>Movie Recommendations - Horror4Ever</title>
+</head>
+<body>
+  <div class="recommendations-container">
+    <!-- Header -->
+    <header class="recommendations-header">
+      <a href="../../index.html" class="back-button">← Back to Home</a>
+      <h1 class="main-title">🎬 HORROR MOVIE RECOMMENDATIONS</h1>
+      <div class="account-menu">
+        <button id="accountButton" class="account-button" onclick="toggleAccountMenu()">👤 Account</button>
+        <div id="accountDropdown" class="account-dropdown" style="display: none;">
+          <a href="profile.html" class="dropdown-item">📝 Edit Profile</a>
+          <a href="member-auth.html" class="dropdown-item">🔐 Login/Logout</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Preference Form Screen -->
+    <div id="preferenceScreen" class="screen active">
+      <div class="preference-content">
+        <h2 class="preference-title">🎃 Tell Us What You're Looking For</h2>
+        <p class="preference-subtitle">Help us find the perfect horror movie for you!</p>
+        
+        <form id="preferenceForm" class="preference-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="subgenre">Subgenre *</label>
+              <select id="subgenre" name="subgenre" required>
+                <option value="">Select a subgenre...</option>
+                <option value="slasher">Slasher</option>
+                <option value="supernatural">Supernatural</option>
+                <option value="psychological">Psychological</option>
+                <option value="found-footage">Found Footage</option>
+                <option value="body-horror">Body Horror</option>
+                <option value="folk-horror">Folk Horror</option>
+                <option value="cosmic-horror">Cosmic Horror</option>
+                <option value="zombie">Zombie</option>
+                <option value="vampire">Vampire</option>
+                <option value="survival">Survival Horror</option>
+                <option value="gothic">Gothic</option>
+                <option value="surreal">Surreal Horror</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="mood">Mood *</label>
+              <select id="mood" name="mood" required>
+                <option value="">Select a mood...</option>
+                <option value="terrifying">Terrifying</option>
+                <option value="atmospheric">Atmospheric</option>
+                <option value="gory">Gory</option>
+                <option value="mind-bending">Mind-bending</option>
+                <option value="creepy">Creepy</option>
+                <option value="disturbing">Disturbing</option>
+                <option value="fun">Fun & Campy</option>
+                <option value="suspenseful">Suspenseful</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="region">Region *</label>
+              <select id="region" name="region" required>
+                <option value="">Select region...</option>
+                <option value="domestic">Domestic (US/Canada)</option>
+                <option value="foreign">Foreign</option>
+                <option value="any">Any Region</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="timeframe">Timeframe *</label>
+              <select id="timeframe" name="timeframe" required>
+                <option value="">Select timeframe...</option>
+                <option value="classic">Classic (Pre-1980)</option>
+                <option value="80s-90s">80s & 90s</option>
+                <option value="2000s">2000s</option>
+                <option value="2010s">2010s</option>
+                <option value="recent">Recent (2020+)</option>
+                <option value="any">Any Era</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="excludeSeen">Exclude Movies You've Seen</label>
+            <div class="checkbox-group">
+              <input type="checkbox" id="excludeSeen" name="excludeSeen">
+              <label for="excludeSeen" class="checkbox-label">Yes, exclude movies I've already watched</label>
+            </div>
+          </div>
+
+          <div class="member-benefits-notice" id="memberBenefitsNotice" style="display: none;">
+            <h3>🎃 Member Benefits</h3>
+            <p>As a subscriber, you get:</p>
+            <ul>
+              <li>📊 Personalized recommendations based on your preferences</li>
+              <li>📈 Improved suggestions as you rate movies</li>
+              <li>📧 Follow-up emails to rate movies you watch</li>
+              <li>🎯 Better filtering based on your viewing history</li>
+            </ul>
+          </div>
+
+          <div class="form-buttons">
+            <button type="submit" class="get-recommendations-button">🎬 GET RECOMMENDATIONS</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="screen">
+      <div class="loading-content">
+        <div class="loading-spinner"></div>
+        <h2>🎃 Finding Perfect Horror Movies...</h2>
+        <p>Searching through our extensive horror collection...</p>
+      </div>
+    </div>
+
+    <!-- Recommendations Screen -->
+    <div id="recommendationsScreen" class="screen">
+      <div class="recommendations-header-section">
+        <h2 class="recommendations-title">🎬 Here Are Your Recommendations</h2>
+        <p class="recommendations-subtitle">Based on your preferences for <span id="preferenceSummary"></span></p>
+        <button id="tryAgainButton" class="try-again-button">🔄 Try Different Movies</button>
+      </div>
+
+      <div class="recommendations-grid" id="recommendationsGrid">
+        <!-- Recommendations will be dynamically inserted here -->
+      </div>
+
+      <div class="recommendations-footer">
+        <button id="newPreferencesButton" class="new-preferences-button">📝 New Preferences</button>
+        <button id="backToHomeButton" class="back-to-home-button">🏠 Back to Home</button>
+      </div>
+    </div>
+
+    <!-- Movie Detail Modal -->
+    <div id="movieDetailModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <span class="close-button" onclick="closeMovieModal()">&times;</span>
+        
+        <div class="movie-detail-content">
+          <div class="movie-detail-header">
+            <img id="modalMoviePoster" src="" alt="Movie Poster" class="modal-poster">
+            <div class="modal-movie-info">
+              <h2 id="modalMovieTitle"></h2>
+              <div class="modal-movie-meta">
+                <span id="modalMovieYear"></span> • 
+                <span id="modalMovieRuntime"></span> • 
+                <span id="modalMovieRating"></span>
+              </div>
+              <div class="modal-movie-genres" id="modalMovieGenres"></div>
+            </div>
+          </div>
+
+          <div class="movie-detail-body">
+            <div class="movie-description">
+              <h3>Synopsis</h3>
+              <p id="modalMovieDescription"></p>
+            </div>
+
+            <div class="movie-trailer-section">
+              <h3>🎬 Trailer</h3>
+              <div id="modalTrailerContainer" class="trailer-container">
+                <!-- Trailer will be embedded here -->
+              </div>
+            </div>
+
+            <div class="streaming-platforms">
+              <h3>📺 Where to Watch</h3>
+              <div id="modalStreamingPlatforms" class="platforms-grid">
+                <!-- Streaming platforms will be listed here -->
+              </div>
+            </div>
+          </div>
+
+          <div class="movie-detail-actions">
+            <button id="watchTrailerButton" class="watch-trailer-button">🎬 Watch Trailer</button>
+            <button id="findStreamingButton" class="find-streaming-button">📺 Find Where to Watch</button>
+            <button id="notInterestedButton" class="not-interested-button">❌ Not Interested</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../src/recommendations.js"></script>
+  
+  <!-- Account Menu Script -->
+  <script>
+    function toggleAccountMenu() {
+      const dropdown = document.getElementById('accountDropdown');
+      dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+      const accountMenu = document.querySelector('.account-menu');
+      const dropdown = document.getElementById('accountDropdown');
+      
+      if (!accountMenu.contains(event.target)) {
+        dropdown.style.display = 'none';
+      }
+    });
+
+    // Close movie modal
+    function closeMovieModal() {
+      document.getElementById('movieDetailModal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('movieDetailModal');
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>
